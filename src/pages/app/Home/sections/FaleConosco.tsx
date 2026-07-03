@@ -24,14 +24,14 @@ export default function FaleConosco() {
     }
 
     return (
-        <section className="px-10">
+        <section className="px-6 sm:px-10">
 
             {/* Header */}
             <div className="text-center mb-14">
                 <p className="text-[11px] font-bold tracking-[2px] uppercase text-[#8aa0bc] mb-4">
                     Fale conosco
                 </p>
-                <h2 className="text-[44px] font-black leading-none tracking-[-2px] text-[#0a0a0a]">
+                <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a]">
                     Como podemos te ajudar?
                 </h2>
             </div>
@@ -39,7 +39,7 @@ export default function FaleConosco() {
             <div className="max-w-[860px] mx-auto grid grid-cols-2 gap-6">
 
                 {/* Formulário */}
-                <div className="col-span-2 bg-white border border-[#d0dce8] rounded-2xl p-8">
+                <div className="col-span-2 bg-white border border-[#d0dce8] rounded-2xl p-5 sm:p-8">
 
                     {sent ? (
                         <div className="h-full flex flex-col items-center justify-center text-center gap-4 py-10">
@@ -62,7 +62,7 @@ export default function FaleConosco() {
                     ) : (
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-xs font-semibold text-[#334a60]">Nome completo</label>
                                     <input
@@ -88,7 +88,7 @@ export default function FaleConosco() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-xs font-semibold text-[#334a60]">Telefone</label>
                                     <input
@@ -133,7 +133,7 @@ export default function FaleConosco() {
 
                             <button
                                 type="submit"
-                                className="bg-[#1a6dff] text-white px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-[#0052d4] transition-colors duration-150 cursor-pointer border-none w-fit mt-2"
+                                className="w-full sm:w-fit bg-[#1a6dff] text-white px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-[#0052d4] transition-colors duration-150 cursor-pointer border-none mt-2"
                             >
                                 Enviar mensagem →
                             </button>

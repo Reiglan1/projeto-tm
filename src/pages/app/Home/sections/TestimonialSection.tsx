@@ -27,20 +27,20 @@ export default function TestimonialSection() {
   ];
 
   return (
-    <section className="bg-[#1a4f9e] px-10 py-20">
+    <section className="bg-[#1a4f9e] px-6 py-14 sm:px-10 sm:py-20">
 
       {/* Header */}
       <div className="text-center mb-14">
         <p className="text-[11px] font-bold tracking-[2px] uppercase text-white/40 mb-4">
           Avaliações reais
         </p>
-        <h2 className="text-[44px] font-black leading-none tracking-[-2px] text-white">
+        <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-white">
           O que nossos<br />clientes dizem.
         </h2>
       </div>
 
       {/* Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {testimonials.map((item, index) => (
           <div
             key={item.name}

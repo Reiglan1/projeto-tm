@@ -6,13 +6,13 @@ export default function FooterSigned() {
     };
 
     return (
-        <footer className="bg-[#1a4f9e] border-t border-[#d0dce8] px-10 pt-14 pb-9">
+        <footer className="bg-[#1a4f9e] border-t border-[#d0dce8] px-6 pt-10 pb-8 sm:px-10 sm:pt-14 sm:pb-9">
 
             {/* Topo */}
-            <div className="grid grid-cols-4 gap-12 mb-12">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12 mb-12">
 
                 {/* Brand */}
-                <div>
+                <div className="col-span-2 sm:col-span-1">
                     <p className="text-[20px] font-black tracking-tight text-[#0a0a0a] mb-3.5">
                         servi<span className="text-white">já</span>
                     </p>
@@ -45,7 +45,7 @@ export default function FooterSigned() {
             </div>
 
             {/* Base */}
-            <div className="flex justify-between items-center border-t border-[#d0dce8] pt-7">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 border-t border-[#d0dce8] pt-7">
                 <p className="text-xs text-white">
                     © 2026 Servijá Tecnologia Ltda. Todos os direitos reservados.
                 </p>

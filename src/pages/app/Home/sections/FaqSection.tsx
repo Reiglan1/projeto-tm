@@ -44,7 +44,7 @@ export default function FAQSection() {
     }
 
     return (
-        <section className="bg-white border-t border-[#e8eef6] px-10 py-20 flex">
+        <section className="bg-white border-t border-[#e8eef6] px-6 py-14 sm:px-10 sm:py-20 flex flex-col sm:flex-row gap-12 sm:gap-0">
             <div className="w-full">
 
                 {/* Header */}
@@ -52,7 +52,7 @@ export default function FAQSection() {
                     <p className="text-[11px] font-bold tracking-[2px] uppercase text-[#8aa0bc] mb-4">
                         FAQ
                     </p>
-                    <h2 className="text-[44px] font-black leading-none tracking-[-2px] text-[#0a0a0a]">
+                    <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a]">
                         Perguntas frequentes.
                     </h2>
                 </div>

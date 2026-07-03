@@ -23,20 +23,20 @@ export default function HowItWorksSection() {
   ];
 
   return (
-    <section className="bg-white border-t border-[#e8eef6] px-10 py-20">
+    <section className="bg-white border-t border-[#e8eef6] px-6 py-14 sm:px-10 sm:py-20">
 
       {/* Header */}
       <div className="mb-14 text-center">
         <p className="text-[11px] font-bold tracking-[2px] uppercase text-[#8aa0bc] mb-4">
           Como funciona
         </p>
-        <h2 className="text-[44px] font-black leading-none tracking-[-2px] text-[#0a0a0a]">
+        <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a]">
           Do pedido ao serviço<br />em poucos passos.
         </h2>
       </div>
 
       {/* Steps */}
-      <div className="grid grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-8">
         {steps.map((step) => (
           <div key={step.number} className="flex flex-col items-center text-center">
             <span className="text-[64px] font-black tracking-[-3px] text-[#d0dce8] leading-none mb-5">

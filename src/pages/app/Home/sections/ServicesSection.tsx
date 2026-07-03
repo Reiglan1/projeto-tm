@@ -39,15 +39,15 @@ export default function ServicesSection() {
     ];
 
     return (
-        <section className="bg-[#eef4ff] border-t border-[#d0dce8] px-10 py-20">
+        <section className="bg-[#eef4ff] border-t border-[#d0dce8] px-6 py-14 sm:px-10 sm:py-20">
 
             {/* Header */}
-            <div className="flex justify-between items-end mb-11">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-5 sm:gap-0 mb-11">
                 <div>
                     <p className="text-[11px] font-bold tracking-[2px] uppercase text-[#6a90b8] mb-3">
                         Categorias
                     </p>
-                    <h2 className="text-[44px] font-black leading-none tracking-[-2px] text-[#0a0a0a]">
+                    <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a]">
                         Qualquer serviço,<br />um único lugar.
                     </h2>
                 </div>
@@ -57,7 +57,7 @@ export default function ServicesSection() {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {services.map((service) => (
                     <div
                         key={service.title}
