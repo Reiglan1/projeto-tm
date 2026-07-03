@@ -20,47 +20,49 @@ export default function TestimonialSection() {
     },
   ];
 
-  const avatarColors = [
-    "bg-white text-[#1a4f9e]",
-    "bg-white/20 text-white",
-    "bg-white/15 text-white",
-  ];
+  const tornEdgeStyle = {
+    backgroundImage:
+      "linear-gradient(135deg, transparent 50%, #12233D 50%), linear-gradient(-135deg, transparent 50%, #12233D 50%)",
+    backgroundSize: "12px 12px",
+    backgroundPosition: "0 0, 0 0",
+    backgroundRepeat: "repeat-x",
+  };
 
   return (
-    <section className="bg-[#1a4f9e] px-6 py-14 sm:px-10 sm:py-20">
+    <section className="bg-[#12233D] px-6 py-14 sm:px-10 sm:py-20">
 
       {/* Header */}
       <div className="text-center mb-14">
-        <p className="text-[11px] font-bold tracking-[2px] uppercase text-white/40 mb-4">
+        <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#E8A33D] mb-4">
+          <span className="w-[18px] h-px bg-[#E8A33D]" />
           Avaliações reais
         </p>
-        <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-white">
-          O que nossos<br />clientes dizem.
+        <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-white">
+          O que quem já<br />usou diz.
         </h2>
       </div>
 
-      {/* Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {testimonials.map((item, index) => (
-          <div
-            key={item.name}
-            className="bg-white/8 border border-white/15 rounded-2xl px-6 py-7"
-          >
-            <p className="text-white text-sm tracking-[2px] mb-4">★★★★★</p>
-            <p className="text-sm text-white/75 leading-relaxed mb-5">
-              {item.text}
-            </p>
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${avatarColors[index]}`}
-              >
-                {item.initials}
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">{item.name}</p>
-                <p className="text-[11px] text-white/40">{item.role}</p>
+      {/* Cards - estilo recibo */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        {testimonials.map((item) => (
+          <div key={item.name} className="flex flex-col">
+            <div className="bg-[#1B3350] rounded-t-md px-6 py-7">
+              <p className="text-[#E8A33D] text-sm tracking-[2px] mb-4">★★★★★</p>
+              <p className="text-sm text-white/80 leading-relaxed mb-6">
+                "{item.text}"
+              </p>
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3E6990] to-[#12233D] flex items-center justify-center text-xs font-bold text-white flex-shrink-0">
+                  {item.initials}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{item.name}</p>
+                  <p className="text-[11px] text-white/45">{item.role}</p>
+                </div>
               </div>
             </div>
+            {/* Borda serrilhada - canhoto do recibo */}
+            <div className="h-3 bg-[#12233D]" style={tornEdgeStyle} />
           </div>
         ))}
       </div>

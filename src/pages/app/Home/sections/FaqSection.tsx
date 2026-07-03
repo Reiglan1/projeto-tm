@@ -44,15 +44,16 @@ export default function FAQSection() {
     }
 
     return (
-        <section className="bg-white border-t border-[#e8eef6] px-6 py-14 sm:px-10 sm:py-20 flex flex-col sm:flex-row gap-12 sm:gap-0">
+        <section className="bg-white border-t border-[#C7D1CB] px-6 py-14 sm:px-10 sm:py-20 flex flex-col sm:flex-row gap-12 sm:gap-0">
             <div className="w-full">
 
                 {/* Header */}
                 <div className="text-center mb-14">
-                    <p className="text-[11px] font-bold tracking-[2px] uppercase text-[#8aa0bc] mb-4">
+                    <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#3E6990] mb-4">
+                        <span className="w-[18px] h-px bg-[#3E6990]" />
                         FAQ
                     </p>
-                    <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a]">
+                    <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-[#12233D]">
                         Perguntas frequentes.
                     </h2>
                 </div>
@@ -64,22 +65,22 @@ export default function FAQSection() {
                         return (
                             <div
                                 key={index}
-                                className={`border-t border-[#e8eef6] ${index === faqs.length - 1 ? "border-b" : ""}`}
+                                className={`border-t border-[#C7D1CB] ${index === faqs.length - 1 ? "border-b" : ""}`}
                             >
                                 <button
                                     onClick={() => toggle(index)}
                                     className="w-full bg-transparent border-none py-[22px] flex justify-between items-center cursor-pointer gap-4 text-left"
                                 >
                                     <span
-                                        className={`text-[15px] font-bold transition-colors duration-200 ${isOpen ? "text-[#1a6dff]" : "text-[#0a0a0a]"
+                                        className={`text-[15px] font-semibold transition-colors duration-200 ${isOpen ? "text-[#3E6990]" : "text-[#12233D]"
                                             }`}
                                     >
                                         {faq.question}
                                     </span>
                                     <div
-                                        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-lg font-light leading-none transition-all duration-300 ${isOpen
-                                            ? "bg-[#1a6dff] text-white rotate-45"
-                                            : "bg-[#eef4ff] border border-[#d0dce8] text-[#1a6dff]"
+                                        className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 text-lg font-mono font-light leading-none transition-all duration-300 ${isOpen
+                                            ? "bg-[#3E6990] text-white rotate-45"
+                                            : "bg-[#F4F6F4] border border-[#C7D1CB] text-[#3E6990]"
                                             }`}
                                     >
                                         +
@@ -92,7 +93,7 @@ export default function FAQSection() {
                                         }`}
                                     style={{ transition: "max-height 0.35s ease, opacity 0.3s ease" }}
                                 >
-                                    <p className="text-sm text-[#5a6a7a] leading-[1.7] pb-[22px]">
+                                    <p className="text-sm text-[#586268] leading-[1.7] pb-[22px]">
                                         {faq.answer}
                                     </p>
                                 </div>

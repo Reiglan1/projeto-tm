@@ -8,11 +8,12 @@ export default function HeaderApp() {
   const navItems = ["Como funciona", "Serviços", "Profissionais", "Segurança", "Sobre nós"];
 
   return (
-    <header className="flex items-center justify-between px-6 py-[14px] sm:px-10 sm:py-[18px] bg-white border-b border-[#e8eef6] sticky top-0 z-50 font-sans">
+    <header className="flex items-center justify-between px-6 py-[14px] sm:px-10 sm:py-[18px] bg-white/90 backdrop-blur-md border-b border-[#C7D1CB] sticky top-0 z-50 font-sans">
 
       {/* Logo */}
-      <div className="text-[22px] font-black tracking-tight text-[#0a0a0a]">
-        servi<span className="text-[#1a6dff]">já</span>
+      <div className="flex items-center gap-[6px] text-[22px] font-bold tracking-tight text-[#12233D]">
+        servijá
+        <span className="w-[7px] h-[7px] rounded-full bg-[#E8A33D] inline-block" />
       </div>
 
       {/* Links de navegação - escondido no mobile */}
@@ -20,9 +21,8 @@ export default function HeaderApp() {
         <ul className="flex gap-7 list-none m-0 p-0">
           {navItems.map((item) => (
             <li key={item}>
-
               <a href="#"
-                className="text-[#555555] no-underline text-lg font-normal hover:text-[#1a6dff] transition-colors duration-150"
+                className="text-[#586268] no-underline text-[15px] font-medium hover:text-[#12233D] transition-colors duration-150"
               >
                 {item}
               </a>
@@ -32,11 +32,11 @@ export default function HeaderApp() {
       </nav>
 
       {/* Botões de ação - escondido no mobile */}
-      <div className="hidden sm:flex gap-2.5 items-center">
-        <button className="bg-transparent border border-[#d0dce8] text-[#1a6dff] px-5 py-2.5 rounded-full text-[13px] font-medium cursor-pointer hover:bg-[#eef4ff] transition-colors duration-150">
+      <div className="hidden sm:flex gap-3 items-center">
+        <button className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150">
           Entrar
         </button>
-        <button className="bg-[#1a6dff] border-none text-white px-[22px] py-2.5 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-[#0052d4] transition-colors duration-150">
+        <button className="bg-[#12233D] border-none text-white px-[22px] py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150">
           Cadastrar
         </button>
       </div>
@@ -47,20 +47,19 @@ export default function HeaderApp() {
         className="sm:hidden bg-transparent border-none cursor-pointer flex flex-col gap-[5px] p-2"
         aria-label="Abrir menu"
       >
-        <span className={`block w-6 h-[2px] bg-[#0a0a0a] transition-transform duration-200 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-        <span className={`block w-6 h-[2px] bg-[#0a0a0a] transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
-        <span className={`block w-6 h-[2px] bg-[#0a0a0a] transition-transform duration-200 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+        <span className={`block w-6 h-[2px] bg-[#12233D] transition-transform duration-200 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+        <span className={`block w-6 h-[2px] bg-[#12233D] transition-opacity duration-200 ${menuOpen ? "opacity-0" : ""}`} />
+        <span className={`block w-6 h-[2px] bg-[#12233D] transition-transform duration-200 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
       </button>
 
       {/* Menu mobile expansível */}
       {menuOpen && (
-        <div className="sm:hidden absolute top-full left-0 w-full bg-white border-b border-[#e8eef6] flex flex-col px-6 py-5 gap-5">
+        <div className="sm:hidden absolute top-full left-0 w-full bg-white border-b border-[#C7D1CB] flex flex-col px-6 py-5 gap-5">
           <ul className="flex flex-col gap-4 list-none m-0 p-0">
             {navItems.map((item) => (
               <li key={item}>
-
                 <a href="#"
-                  className="text-[#555555] no-underline text-base font-normal hover:text-[#1a6dff] transition-colors duration-150"
+                  className="text-[#586268] no-underline text-base font-medium hover:text-[#12233D] transition-colors duration-150"
                 >
                   {item}
                 </a>
@@ -68,10 +67,10 @@ export default function HeaderApp() {
             ))}
           </ul>
           <div className="flex flex-col gap-2.5">
-            <button className="w-full bg-transparent border border-[#d0dce8] text-[#1a6dff] px-5 py-2.5 rounded-full text-[13px] font-medium cursor-pointer hover:bg-[#eef4ff] transition-colors duration-150">
+            <button className="w-full bg-transparent border border-[#C7D1CB] text-[#12233D] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150">
               Entrar
             </button>
-            <button className="w-full bg-[#1a6dff] border-none text-white px-[22px] py-2.5 rounded-full text-[13px] font-semibold cursor-pointer hover:bg-[#0052d4] transition-colors duration-150">
+            <button className="w-full bg-[#12233D] border-none text-white px-[22px] py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150">
               Cadastrar
             </button>
           </div>

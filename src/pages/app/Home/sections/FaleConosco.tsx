@@ -28,10 +28,11 @@ export default function FaleConosco() {
 
             {/* Header */}
             <div className="text-center mb-14">
-                <p className="text-[11px] font-bold tracking-[2px] uppercase text-[#8aa0bc] mb-4">
+                <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#3E6990] mb-4">
+                    <span className="w-[18px] h-px bg-[#3E6990]" />
                     Fale conosco
                 </p>
-                <h2 className="text-[30px] sm:text-[44px] font-black leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0a0a0a]">
+                <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-[#12233D]">
                     Como podemos te ajudar?
                 </h2>
             </div>
@@ -39,22 +40,22 @@ export default function FaleConosco() {
             <div className="max-w-[860px] mx-auto grid grid-cols-2 gap-6">
 
                 {/* Formulário */}
-                <div className="col-span-2 bg-white border border-[#d0dce8] rounded-2xl p-5 sm:p-8">
+                <div className="col-span-2 bg-white border border-[#C7D1CB] rounded-md p-5 sm:p-8">
 
                     {sent ? (
                         <div className="h-full flex flex-col items-center justify-center text-center gap-4 py-10">
-                            <div className="w-14 h-14 rounded-full bg-[#eef4ff] border border-[#d0dce8] flex items-center justify-center text-2xl">
+                            <div className="w-14 h-14 rounded-full bg-[#5C8368]/10 border border-[#5C8368]/30 flex items-center justify-center text-2xl">
                                 ✅
                             </div>
-                            <h3 className="text-xl font-black tracking-[-1px] text-[#0a0a0a]">
+                            <h3 className="text-xl font-bold tracking-[-1px] text-[#12233D]">
                                 Mensagem enviada!
                             </h3>
-                            <p className="text-sm text-[#5a6a7a] max-w-xs leading-relaxed">
+                            <p className="text-sm text-[#586268] max-w-xs leading-relaxed">
                                 Recebemos sua mensagem e retornaremos em breve. Obrigado pelo contato!
                             </p>
                             <button
                                 onClick={() => { setSent(false); setFormData({ name: "", email: "", phone: "", subject: "", message: "" }); }}
-                                className="mt-2 text-sm font-semibold text-[#1a6dff] hover:underline bg-transparent border-none cursor-pointer"
+                                className="mt-2 text-sm font-semibold text-[#3E6990] hover:underline bg-transparent border-none cursor-pointer"
                             >
                                 Enviar outra mensagem
                             </button>
@@ -64,18 +65,18 @@ export default function FaleConosco() {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-semibold text-[#334a60]">Nome completo</label>
+                                    <label className="text-[11px] font-mono font-semibold uppercase tracking-[0.05em] text-[#1B3350]">Nome completo</label>
                                     <input
                                         name="name"
                                         value={formData.name}
                                         onChange={handleChange}
                                         required
                                         placeholder="Seu nome"
-                                        className="bg-[#f4f8fd] border border-[#d0dce8] rounded-xl px-4 py-3 text-sm text-[#0a0a0a] placeholder-[#a0b4c8] outline-none focus:border-[#1a6dff] focus:bg-white transition-all duration-150"
+                                        className="bg-[#F4F6F4] border border-[#C7D1CB] rounded-[4px] px-4 py-3 text-sm text-[#12233D] placeholder-[#8a95a0] outline-none focus:border-[#3E6990] focus:bg-white transition-all duration-150"
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-semibold text-[#334a60]">E-mail</label>
+                                    <label className="text-[11px] font-mono font-semibold uppercase tracking-[0.05em] text-[#1B3350]">E-mail</label>
                                     <input
                                         name="email"
                                         type="email"
@@ -83,30 +84,30 @@ export default function FaleConosco() {
                                         onChange={handleChange}
                                         required
                                         placeholder="seu@email.com"
-                                        className="bg-[#f4f8fd] border border-[#d0dce8] rounded-xl px-4 py-3 text-sm text-[#0a0a0a] placeholder-[#a0b4c8] outline-none focus:border-[#1a6dff] focus:bg-white transition-all duration-150"
+                                        className="bg-[#F4F6F4] border border-[#C7D1CB] rounded-[4px] px-4 py-3 text-sm text-[#12233D] placeholder-[#8a95a0] outline-none focus:border-[#3E6990] focus:bg-white transition-all duration-150"
                                     />
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-semibold text-[#334a60]">Telefone</label>
+                                    <label className="text-[11px] font-mono font-semibold uppercase tracking-[0.05em] text-[#1B3350]">Telefone</label>
                                     <input
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleChange}
                                         placeholder="(00) 00000-0000"
-                                        className="bg-[#f4f8fd] border border-[#d0dce8] rounded-xl px-4 py-3 text-sm text-[#0a0a0a] placeholder-[#a0b4c8] outline-none focus:border-[#1a6dff] focus:bg-white transition-all duration-150"
+                                        className="bg-[#F4F6F4] border border-[#C7D1CB] rounded-[4px] px-4 py-3 text-sm text-[#12233D] placeholder-[#8a95a0] outline-none focus:border-[#3E6990] focus:bg-white transition-all duration-150"
                                     />
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-semibold text-[#334a60]">Assunto</label>
+                                    <label className="text-[11px] font-mono font-semibold uppercase tracking-[0.05em] text-[#1B3350]">Assunto</label>
                                     <select
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleChange}
                                         required
-                                        className="bg-[#f4f8fd] border border-[#d0dce8] rounded-xl px-4 py-3 text-sm text-[#0a0a0a] outline-none focus:border-[#1a6dff] focus:bg-white transition-all duration-150 cursor-pointer"
+                                        className="bg-[#F4F6F4] border border-[#C7D1CB] rounded-[4px] px-4 py-3 text-sm text-[#12233D] outline-none focus:border-[#3E6990] focus:bg-white transition-all duration-150 cursor-pointer"
                                     >
                                         <option value="" disabled>Selecione</option>
                                         <option value="suporte">Suporte técnico</option>
@@ -119,7 +120,7 @@ export default function FaleConosco() {
                             </div>
 
                             <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-semibold text-[#334a60]">Mensagem</label>
+                                <label className="text-[11px] font-mono font-semibold uppercase tracking-[0.05em] text-[#1B3350]">Mensagem</label>
                                 <textarea
                                     name="message"
                                     value={formData.message}
@@ -127,13 +128,13 @@ export default function FaleConosco() {
                                     required
                                     rows={5}
                                     placeholder="Descreva sua dúvida ou problema..."
-                                    className="bg-[#f4f8fd] border border-[#d0dce8] rounded-xl px-4 py-3 text-sm text-[#0a0a0a] placeholder-[#a0b4c8] outline-none focus:border-[#1a6dff] focus:bg-white transition-all duration-150 resize-none"
+                                    className="bg-[#F4F6F4] border border-[#C7D1CB] rounded-[4px] px-4 py-3 text-sm text-[#12233D] placeholder-[#8a95a0] outline-none focus:border-[#3E6990] focus:bg-white transition-all duration-150 resize-none"
                                 />
                             </div>
 
                             <button
                                 type="submit"
-                                className="w-full sm:w-fit bg-[#1a6dff] text-white px-7 py-3.5 rounded-full text-sm font-semibold hover:bg-[#0052d4] transition-colors duration-150 cursor-pointer border-none mt-2"
+                                className="w-full sm:w-fit bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none mt-2"
                             >
                                 Enviar mensagem →
                             </button>
