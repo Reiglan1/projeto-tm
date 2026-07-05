@@ -13,7 +13,11 @@ import { lazy } from "react";
 import { ROUTES } from "./constants/Constants";
 // const LoginPage = lazy(() => import("@/pages/auth/Login/Login"));
 const HomeAuthPage = lazy(() => import("@/pages/auth/Home/Home"));
-
+const ProfilePage = lazy(() => import("@/pages/app/Profile/Profile"));
+const VerificationPage = lazy(() => import("@/pages/app/Verification/Verification"));
+const OpenServiceOrderPage = lazy(() => import("@/pages/app/OpenServiceOrder/OpenServiceOrder"));
+const MyServiceOrdersPage = lazy(() => import("@/pages/app/MyServiceOrders/MyServiceOrders"));
+const WalletPage = lazy(() => import("@/pages/app/Wallet/Wallet"));
 const HomePage = lazy(() => import("@/pages/app/Home/Home"));
 const LayoutAuth = lazy(() => import("@/pages/auth/LayoutAuth/LayoutAuth"));
 const LayoutApp = lazy(() => import("@/pages/app/LayoutApp/LayoutApp"));
@@ -81,6 +85,31 @@ const RouterConfig = createBrowserRouter([
               {
                 path: ROUTES.HOME,
                 Component: HomePage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.PROFILE,
+                Component: ProfilePage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.VERIFICATION,
+                Component: VerificationPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.OPEN_SERVICE_ORDER,
+                Component: OpenServiceOrderPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.MY_SERVICE_ORDERS,
+                Component: MyServiceOrdersPage,
+                errorElement: <ErrorElement />,
+              },
+               {
+                path: ROUTES.WALLET,
+                Component: WalletPage,
                 errorElement: <ErrorElement />,
               },
             ],

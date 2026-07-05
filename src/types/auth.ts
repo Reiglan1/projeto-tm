@@ -60,3 +60,7 @@ export interface AuthenticatedUser {
   email: string;
   role: UserRole;
 }
+
+export interface RequestDeleteAccountJason {
+  password: string;
+}
