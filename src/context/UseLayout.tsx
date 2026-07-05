@@ -1,14 +1,15 @@
 import { useState } from "react";
+import { AuthenticatedUser } from "@/types/auth";
 
 export interface LayoutProps {
     token?: string;
-    user?: any;
+    user?: AuthenticatedUser;
     fullLoading: boolean;
     cardState: CardStateProps;
     setToken: (value: string) => void;
-    setUser: (user: any) => void;
+    setUser: (user: AuthenticatedUser | undefined) => void;
     setFullLoading: (value: boolean) => void;
-    login: (token: string) => void;
+    login: (token: string, user?: AuthenticatedUser) => void;
     logout: () => void;
     setCardState: (value: any) => void;
 }
@@ -18,6 +19,17 @@ interface CardStateProps {
     userDocumentId: string;
 }
 
+function readStoredUser(): AuthenticatedUser | undefined {
+    if (typeof window === "undefined") return undefined;
+    const raw = window.localStorage?.getItem("user");
+    if (!raw) return undefined;
+    try {
+        return JSON.parse(raw) as AuthenticatedUser;
+    } catch {
+        return undefined;
+    }
+}
+
 export const useLayoutState = (): LayoutProps => {
     const [fullLoading, setFullLoading] = useState(false);
     const [token, setToken] = useState<string | undefined>(
@@ -25,25 +37,41 @@ export const useLayoutState = (): LayoutProps => {
             ? window.localStorage?.getItem("token") || undefined
             : undefined
     );
-    const [user, setUser] = useState();
+    const [user, setUserState] = useState<AuthenticatedUser | undefined>(readStoredUser());
     const [cardState, setCardState] = useState<CardStateProps>({
         step: 0,
         documentId: "",
         userDocumentId: "",
     });
 
-    const login = (token: string) => {
+    const setUser = (value: AuthenticatedUser | undefined) => {
+        if (typeof window !== "undefined") {
+            if (value) {
+                window.localStorage?.setItem("user", JSON.stringify(value));
+            } else {
+                window.localStorage?.removeItem("user");
+            }
+        }
+        setUserState(value);
+    };
+
+    const login = (token: string, user?: AuthenticatedUser) => {
         if (typeof window !== "undefined") {
             window.localStorage?.setItem("token", token);
         }
         setToken(token);
+        if (user) {
+            setUser(user);
+        }
     };
 
     const logout = () => {
         if (typeof window !== "undefined") {
             window.localStorage?.removeItem("token");
+            window.localStorage?.removeItem("user");
         }
         setToken(undefined);
+        setUserState(undefined);
     };
 
     return {

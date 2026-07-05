@@ -11,7 +11,8 @@ import ErrorBoundary from "@/components/ErrorBoundary/ErrorBoundary";
 import ErrorElement from "@/components/ErrorBoundary/ErrorElement";
 import { lazy } from "react";
 import { ROUTES } from "./constants/Constants";
-const LoginPage = lazy(() => import("@/pages/auth/Login/Login"));
+// const LoginPage = lazy(() => import("@/pages/auth/Login/Login"));
+const HomeAuthPage = lazy(() => import("@/pages/auth/Home/Home"));
 
 const HomePage = lazy(() => import("@/pages/app/Home/Home"));
 const LayoutAuth = lazy(() => import("@/pages/auth/LayoutAuth/LayoutAuth"));
@@ -100,7 +101,7 @@ const RouterConfig = createBrowserRouter([
             children: [
               {
                 path: ROUTES.LOGIN,
-                Component: LoginPage,
+                Component: HomeAuthPage,
                 errorElement: <ErrorElement />,
               },
             ],
