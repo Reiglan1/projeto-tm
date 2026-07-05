@@ -14,7 +14,7 @@ export default function FooterAuth() {
                 {/* Brand */}
                 <div className="col-span-2 sm:col-span-1">
                     <p className="flex items-center gap-1.5 text-[20px] font-bold tracking-tight text-white mb-3.5">
-                        servijá
+                        Three Minds
                         <span className="w-[6px] h-[6px] rounded-full bg-[#E8A33D] inline-block" />
                     </p>
                     <p className="text-sm text-white/55 leading-relaxed">
@@ -48,7 +48,7 @@ export default function FooterAuth() {
             {/* Base */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 border-t border-white/10 pt-7">
                 <p className="text-xs text-white/45">
-                    © 2026 Servijá Tecnologia Ltda. Todos os direitos reservados.
+                    © 2026 Three Minds Tecnologia Ltda. Todos os direitos reservados.
                 </p>
                 <div className="flex gap-5">
                     {["Termos", "Privacidade", "Cookies"].map((item) => (

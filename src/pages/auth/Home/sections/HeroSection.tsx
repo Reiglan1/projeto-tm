@@ -1,4 +1,9 @@
+import { useAuthModal } from "@/context/AuthModalContext";
+
 export default function HeroSection() {
+
+    const { openRegister } = useAuthModal();
+
     return (
         <section className="relative overflow-hidden bg-[#F4F6F4] border-b border-[#C7D1CB] px-6 py-14 sm:px-10 sm:py-24">
 
@@ -32,10 +37,16 @@ export default function HeroSection() {
                     </p>
 
                     <div className="flex gap-3 flex-wrap justify-center sm:justify-start w-full sm:w-auto mb-10">
-                        <button className="w-full sm:w-auto bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none">
+                        <button
+                            onClick={() => openRegister("client")}
+                            className="w-full sm:w-auto bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none"
+                        >
                             Abrir chamado →
                         </button>
-                        <button className="w-full sm:w-auto bg-white text-[#12233D] px-7 py-3.5 rounded-md text-sm font-semibold border border-[#C7D1CB] hover:border-[#12233D] transition-colors duration-150 cursor-pointer">
+                        <button
+                            onClick={() => openRegister("worker")}
+                            className="w-full sm:w-auto bg-white text-[#12233D] px-7 py-3.5 rounded-md text-sm font-semibold border border-[#C7D1CB] hover:border-[#12233D] transition-colors duration-150 cursor-pointer"
+                        >
                             Sou profissional
                         </button>
                     </div>

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal/Modal";
 import RoleTabs from "./RoleTabs";
@@ -9,6 +9,7 @@ import { isValidEmail } from "@/utils/Validators";
 
 interface LoginModalProps {
   open: boolean;
+  defaultRole?: UserRole;
   onClose: () => void;
   onSwitchToRegister: () => void;
 }
@@ -20,18 +21,25 @@ interface FieldErrors {
 
 export default function LoginModal({
   open,
+  defaultRole = "client",
   onClose,
   onSwitchToRegister,
 }: LoginModalProps) {
   const navigate = useNavigate();
   const { login } = useLayout();
 
-  const [role, setRole] = useState<UserRole>("client");
+  const [role, setRole] = useState<UserRole>(defaultRole);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setRole(defaultRole);
+    }
+  }, [open, defaultRole]);
 
   function resetAndClose() {
     setEmail("");

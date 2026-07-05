@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal/Modal";
 import RoleTabs from "./RoleTabs";
@@ -17,6 +17,7 @@ import { maskCPF, maskPhone } from "@/utils/Masks";
 
 interface RegisterModalProps {
   open: boolean;
+  defaultRole?: UserRole;
   onClose: () => void;
   onSwitchToLogin: () => void;
 }
@@ -36,18 +37,25 @@ type FieldErrors = Partial<Record<FormField, string>>;
 
 export default function RegisterModal({
   open,
+  defaultRole = "client",
   onClose,
   onSwitchToLogin,
 }: RegisterModalProps) {
   const navigate = useNavigate();
   const { login } = useLayout();
 
-  const [role, setRole] = useState<UserRole>("client");
+  const [role, setRole] = useState<UserRole>(defaultRole);
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [passwordFocused, setPasswordFocused] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setRole(defaultRole);
+    }
+  }, [open, defaultRole]);
 
   function updateField<K extends FormField>(
     field: K,
@@ -155,9 +163,8 @@ export default function RegisterModal({
             type="text"
             value={form.name}
             onChange={(event) => updateField("name", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="Seu nome"
           />
           {fieldErrors.name && (
@@ -173,9 +180,8 @@ export default function RegisterModal({
             type="email"
             value={form.email}
             onChange={(event) => updateField("email", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="voce@email.com"
           />
           {fieldErrors.email && (
@@ -195,9 +201,8 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("cpf", maskCPF(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
               placeholder="000.000.000-00"
             />
             {fieldErrors.cpf && (
@@ -215,9 +220,8 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("phone", maskPhone(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
               placeholder="(00) 00000-0000"
             />
             {fieldErrors.phone && (
@@ -235,9 +239,8 @@ export default function RegisterModal({
             value={form.password}
             onFocus={() => setPasswordFocused(true)}
             onChange={(event) => updateField("password", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="••••••••"
           />
           {fieldErrors.password && (
@@ -249,9 +252,8 @@ export default function RegisterModal({
               {passwordRules.map((rule) => (
                 <li
                   key={rule.label}
-                  className={`text-xs flex items-center gap-1.5 ${
-                    rule.valid ? "text-green-600" : "text-[#586268]"
-                  }`}
+                  className={`text-xs flex items-center gap-1.5 ${rule.valid ? "text-green-600" : "text-[#586268]"
+                    }`}
                 >
                   <span>{rule.valid ? "✓" : "•"}</span>
                   {rule.label}
@@ -271,9 +273,8 @@ export default function RegisterModal({
             onChange={(event) =>
               updateField("confirmPassword", event.target.value)
             }
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="••••••••"
           />
           {fieldErrors.confirmPassword && (

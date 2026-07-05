@@ -1,4 +1,9 @@
+import { useAuthModal } from "@/context/AuthModalContext";
+
 export default function SplitSection() {
+
+  const { openRegister } = useAuthModal();
+
   return (
     <section className="grid grid-cols-1 sm:grid-cols-2 border-b border-[#C7D1CB]">
 
@@ -20,7 +25,10 @@ export default function SplitSection() {
         <p className="text-sm text-[#586268] leading-relaxed mb-8 max-w-sm">
           Compare profissionais avaliados, veja o preço fechado antes de aceitar e pague só depois que o serviço acabar.
         </p>
-        <button className="w-full sm:w-auto bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none">
+        <button
+          onClick={() => openRegister("client")}
+          className="w-full sm:w-auto bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none"
+        >
           Criar conta grátis
         </button>
       </div>
@@ -43,7 +51,10 @@ export default function SplitSection() {
         <p className="text-sm text-white/65 leading-relaxed mb-8 max-w-sm">
           Cadastre-se, defina sua agenda e receba chamados de clientes perto de você. Sem mensalidade.
         </p>
-        <button className="w-full sm:w-auto bg-[#E8A33D] text-[#12233D] px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#C97F1E] hover:text-white transition-colors duration-150 cursor-pointer border-none">
+        <button
+          onClick={() => openRegister("worker")}
+          className="w-full sm:w-auto bg-[#E8A33D] text-[#12233D] px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#C97F1E] hover:text-white transition-colors duration-150 cursor-pointer border-none"
+        >
           Começar a trabalhar
         </button>
       </div>

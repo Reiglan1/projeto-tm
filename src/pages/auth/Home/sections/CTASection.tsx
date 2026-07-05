@@ -1,4 +1,8 @@
+import { useAuthModal } from "@/context/AuthModalContext";
+
 export default function CTASection() {
+  const { openRegister } = useAuthModal();
+
   return (
     <section className="bg-[#E8A33D] px-6 py-14 sm:px-10 sm:py-20 flex flex-col items-center text-center">
 
@@ -11,10 +15,16 @@ export default function CTASection() {
       </p>
 
       <div className="flex gap-3 flex-wrap justify-center w-full sm:w-auto">
-        <button className="w-full sm:w-auto bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none">
+        <button
+          onClick={() => openRegister("client")}
+          className="w-full sm:w-auto bg-[#12233D] text-white px-7 py-3.5 rounded-md text-sm font-semibold hover:bg-[#1B3350] transition-colors duration-150 cursor-pointer border-none"
+        >
           Criar conta grátis
         </button>
-        <button className="w-full sm:w-auto bg-transparent text-[#12233D] px-7 py-3.5 rounded-md text-sm font-semibold border border-[#12233D]/30 hover:border-[#12233D] transition-colors duration-150 cursor-pointer">
+        <button
+          onClick={() => openRegister("worker")}
+          className="w-full sm:w-auto bg-transparent text-[#12233D] px-7 py-3.5 rounded-md text-sm font-semibold border border-[#12233D]/30 hover:border-[#12233D] transition-colors duration-150 cursor-pointer"
+        >
           Sou profissional
         </button>
       </div>
