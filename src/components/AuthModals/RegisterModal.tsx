@@ -99,18 +99,18 @@ export default function RegisterModal({
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  function toggleCategory(categoryId: string) {
-    setForm((current) => {
-      const alreadySelected = current.categoryIds.includes(categoryId);
-      return {
-        ...current,
-        categoryIds: alreadySelected
-          ? current.categoryIds.filter((id) => id !== categoryId)
-          : [...current.categoryIds, categoryId],
-      };
-    });
-    setFieldErrors((current) => ({ ...current, categoryIds: undefined }));
-  }
+  // function toggleCategory(categoryId: string) {
+  //   setForm((current) => {
+  //     const alreadySelected = current.categoryIds.includes(categoryId);
+  //     return {
+  //       ...current,
+  //       categoryIds: alreadySelected
+  //         ? current.categoryIds.filter((id) => id !== categoryId)
+  //         : [...current.categoryIds, categoryId],
+  //     };
+  //   });
+  //   setFieldErrors((current) => ({ ...current, categoryIds: undefined }));
+  // }
 
   function resetAndClose() {
     setForm(initialForm);
