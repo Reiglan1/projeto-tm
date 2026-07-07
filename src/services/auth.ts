@@ -2,8 +2,10 @@ import api from "./api";
 import { ApiError, normalizeError } from "./apiError";
 import {
   RequestClientJason,
+  RequestForgotPasswordJason,
   RequestLoginJason,
   RequestResendVerificationJason,
+  RequestResetPasswordJason,
   RequestVerifyEmailJason,
   RequestWorkerJason,
   ResponseClientJason,
@@ -83,6 +85,26 @@ export async function resendVerification(
 ): Promise<void> {
   try {
     await api.post("/api/auth/resend-verification", payload);
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function forgotPassword(
+  payload: RequestForgotPasswordJason
+): Promise<void> {
+  try {
+    await api.post("/api/auth/forgot-password", payload);
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function resetPassword(
+  payload: RequestResetPasswordJason
+): Promise<void> {
+  try {
+    await api.post("/api/auth/reset-password", payload);
   } catch (error) {
     throw normalizeError(error);
   }

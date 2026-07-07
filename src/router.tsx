@@ -13,6 +13,7 @@ import { lazy } from "react";
 import { ROUTES } from "./constants/Constants";
 // const LoginPage = lazy(() => import("@/pages/auth/Login/Login"));
 const HomeAuthPage = lazy(() => import("@/pages/auth/Home/Home"));
+const ResetPasswordPage = lazy(() => import("@/pages/auth/Home/sections/ResetPassword"));
 const ProfilePage = lazy(() => import("@/pages/app/Profile/Profile"));
 const VerificationPage = lazy(() => import("@/pages/app/Verification/Verification"));
 const OpenServiceOrderPage = lazy(() => import("@/pages/app/OpenServiceOrder/OpenServiceOrder"));
@@ -143,6 +144,11 @@ const RouterConfig = createBrowserRouter([
               {
                 path: ROUTES.LOGIN,
                 Component: HomeAuthPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.RESET_PASSWORD,
+                Component: ResetPasswordPage,
                 errorElement: <ErrorElement />,
               },
             ],

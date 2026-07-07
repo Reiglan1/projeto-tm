@@ -8,6 +8,7 @@ import {
   loginWorker,
   verifyEmail,
   resendVerification,
+  forgotPassword,
   ApiError,
 } from "@/services/auth";
 import { UserRole } from "@/types/auth";
@@ -27,7 +28,7 @@ interface FieldErrors {
   password?: string;
 }
 
-type Step = "login" | "verify";
+type Step = "login" | "verify" | "forgot";
 
 // O backend não manda um código de erro estruturado, só uma mensagem de
 // texto — então detectamos "precisa verificar o e-mail" pelo conteúdo dela.
@@ -62,6 +63,10 @@ export default function LoginModal({
   const [resendMessage, setResendMessage] = useState<string | null>(null);
   const [cooldown, setCooldown] = useState(0);
 
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+  const [forgotSent, setForgotSent] = useState(false);
+
   useEffect(() => {
     if (open) {
       setRole(defaultRole);
@@ -85,6 +90,9 @@ export default function LoginModal({
     setVerifyError(null);
     setResendMessage(null);
     setCooldown(0);
+    setForgotLoading(false);
+    setForgotError(null);
+    setForgotSent(false);
     onClose();
   }
 
@@ -187,6 +195,98 @@ export default function LoginModal({
     } finally {
       setResending(false);
     }
+  }
+
+  async function handleForgotSubmit(event: FormEvent) {
+    event.preventDefault();
+    setForgotError(null);
+
+    if (!email.trim() || !isValidEmail(email)) {
+      setForgotError("Informe um e-mail válido");
+      return;
+    }
+
+    setForgotLoading(true);
+
+    try {
+      await forgotPassword({ email, userType: role });
+      setForgotSent(true);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setForgotError(
+        apiError.messages?.join(" ") ?? "Não foi possível enviar o link"
+      );
+    } finally {
+      setForgotLoading(false);
+    }
+  }
+
+  if (step === "forgot") {
+    return (
+      <Modal open={open} onClose={resetAndClose} title="Redefinir senha">
+        {forgotSent ? (
+          <div>
+            <p className="text-sm text-[#586268]">
+              Se existir uma conta com o e-mail{" "}
+              <strong className="text-[#12233D]">{email}</strong>, enviamos um
+              link pra você redefinir sua senha. Confira sua caixa de entrada.
+            </p>
+            <button
+              type="button"
+              onClick={() => setStep("login")}
+              className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 mt-5"
+            >
+              Voltar para o login
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-[#586268] mb-5">
+              Informe seu e-mail e o tipo de conta — vamos te mandar um link
+              pra criar uma nova senha.
+            </p>
+
+            <RoleTabs value={role} onChange={setRole} />
+
+            <form onSubmit={handleForgotSubmit} noValidate className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+                  E-mail
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+                  placeholder="voce@email.com"
+                  autoFocus
+                />
+              </div>
+
+              {forgotError && <p className="text-sm text-red-600">{forgotError}</p>}
+
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {forgotLoading ? "Enviando..." : "Enviar link de redefinição"}
+              </button>
+            </form>
+
+            <p className="text-sm text-[#586268] text-center mt-5">
+              <button
+                type="button"
+                onClick={() => setStep("login")}
+                className="text-[#586268] bg-transparent border-none cursor-pointer p-0 underline"
+              >
+                Voltar
+              </button>
+            </p>
+          </>
+        )}
+      </Modal>
+    );
   }
 
   if (step === "verify") {
@@ -302,6 +402,13 @@ export default function LoginModal({
           {fieldErrors.password && (
             <p className="text-xs text-red-600 mt-1">{fieldErrors.password}</p>
           )}
+          <button
+            type="button"
+            onClick={() => setStep("forgot")}
+            className="text-xs text-[#3E6990] font-medium bg-transparent border-none cursor-pointer p-0 mt-1.5 underline"
+          >
+            Esqueci minha senha
+          </button>
         </div>
 
         {formError && <p className="text-sm text-red-600">{formError}</p>}

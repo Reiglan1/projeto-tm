@@ -20,6 +20,8 @@ export const ROUTES = {
     // Páginas que não estão logadas
     LOGIN: "/login",
 
+    RESET_PASSWORD: "/redefinir-senha",
+
 
 
 } as const;

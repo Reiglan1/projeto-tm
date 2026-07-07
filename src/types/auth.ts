@@ -79,3 +79,14 @@ export interface RequestResendVerificationJason {
   email: string;
   userType: UserRole;
 }
+
+export interface RequestForgotPasswordJason {
+  email: string;
+  userType: UserRole;
+}
+
+export interface RequestResetPasswordJason {
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}
