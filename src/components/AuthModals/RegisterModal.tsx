@@ -4,7 +4,7 @@ import Modal from "@/components/Modal/Modal";
 import RoleTabs from "./RoleTabs";
 import { useLayout } from "@/context/LayoutProvider";
 import { registerClient, registerWorker, ApiError } from "@/services/auth";
-import { UserRole } from "@/types/auth";
+import { RequestClientJason, RequestWorkerJason, UserRole } from "@/types/auth";
 import {
   isValidEmail,
   isValidCPF,
@@ -27,6 +27,7 @@ const initialForm = {
   email: "",
   cpf: "",
   phone: "",
+  profession: "",
   password: "",
   confirmPassword: "",
   acceptTerms: false,
@@ -62,6 +63,7 @@ export default function RegisterModal({
     value: (typeof initialForm)[K]
   ) {
     setForm((current) => ({ ...current, [field]: value }));
+    // limpa o erro do campo assim que o usuário começa a corrigir
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
   }
 
@@ -94,6 +96,10 @@ export default function RegisterModal({
       errors.phone = "Telefone inválido";
     }
 
+    if (role === "worker" && !form.profession.trim()) {
+      errors.profession = "Informe sua profissão";
+    }
+
     if (!isValidPassword(form.password)) {
       errors.password = "A senha não atende aos requisitos abaixo";
     }
@@ -119,17 +125,11 @@ export default function RegisterModal({
 
     setLoading(true);
 
-    const payload = {
-      ...form,
-      cpf: onlyDigits(form.cpf),
-      phone: onlyDigits(form.phone),
-    };
-
     try {
       const response =
         role === "client"
-          ? await registerClient(payload)
-          : await registerWorker(payload);
+          ? await registerClient(buildClientPayload())
+          : await registerWorker(buildWorkerPayload());
 
       login(response.token, {
         id: response.id,
@@ -148,6 +148,33 @@ export default function RegisterModal({
     }
   }
 
+  // Cada role manda só os campos que a API dela espera (o backend rejeita
+  // propriedades extras), então montamos os payloads separadamente.
+  function buildClientPayload(): RequestClientJason {
+    return {
+      name: form.name,
+      email: form.email,
+      cpf: onlyDigits(form.cpf),
+      phone: onlyDigits(form.phone),
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+      acceptTerms: form.acceptTerms,
+    };
+  }
+
+  function buildWorkerPayload(): RequestWorkerJason {
+    return {
+      name: form.name,
+      email: form.email,
+      cpf: onlyDigits(form.cpf),
+      phone: onlyDigits(form.phone),
+      profession: form.profession,
+      password: form.password,
+      confirmPassword: form.confirmPassword,
+      acceptTerms: form.acceptTerms,
+    };
+  }
+
   const passwordRules = checkPasswordRules(form.password);
 
   return (
@@ -163,8 +190,9 @@ export default function RegisterModal({
             type="text"
             value={form.name}
             onChange={(event) => updateField("name", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+              fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
+            }`}
             placeholder="Seu nome"
           />
           {fieldErrors.name && (
@@ -180,8 +208,9 @@ export default function RegisterModal({
             type="email"
             value={form.email}
             onChange={(event) => updateField("email", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+              fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
+            }`}
             placeholder="voce@email.com"
           />
           {fieldErrors.email && (
@@ -201,8 +230,9 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("cpf", maskCPF(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
-                }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+                fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
               placeholder="000.000.000-00"
             />
             {fieldErrors.cpf && (
@@ -220,8 +250,9 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("phone", maskPhone(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
-                }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+                fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
               placeholder="(00) 00000-0000"
             />
             {fieldErrors.phone && (
@@ -229,6 +260,30 @@ export default function RegisterModal({
             )}
           </div>
         </div>
+
+        {role === "worker" && (
+          <div>
+            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              Profissão
+            </label>
+            <input
+              type="text"
+              value={form.profession}
+              onChange={(event) =>
+                updateField("profession", event.target.value)
+              }
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+                fieldErrors.profession ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
+              placeholder="Ex: Eletricista, Encanador, Diarista"
+            />
+            {fieldErrors.profession && (
+              <p className="text-xs text-red-600 mt-1">
+                {fieldErrors.profession}
+              </p>
+            )}
+          </div>
+        )}
 
         <div>
           <label className="block text-sm font-medium text-[#12233D] mb-1.5">
@@ -239,8 +294,9 @@ export default function RegisterModal({
             value={form.password}
             onFocus={() => setPasswordFocused(true)}
             onChange={(event) => updateField("password", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+              fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
+            }`}
             placeholder="••••••••"
           />
           {fieldErrors.password && (
@@ -252,8 +308,9 @@ export default function RegisterModal({
               {passwordRules.map((rule) => (
                 <li
                   key={rule.label}
-                  className={`text-xs flex items-center gap-1.5 ${rule.valid ? "text-green-600" : "text-[#586268]"
-                    }`}
+                  className={`text-xs flex items-center gap-1.5 ${
+                    rule.valid ? "text-green-600" : "text-[#586268]"
+                  }`}
                 >
                   <span>{rule.valid ? "✓" : "•"}</span>
                   {rule.label}
@@ -273,8 +330,9 @@ export default function RegisterModal({
             onChange={(event) =>
               updateField("confirmPassword", event.target.value)
             }
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
+              fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
+            }`}
             placeholder="••••••••"
           />
           {fieldErrors.confirmPassword && (

@@ -26,7 +26,18 @@ export default function HeaderAuth() {
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [walletLoading, setWalletLoading] = useState(false);
 
-  const navItems = ["Serviços", "Profissionais", "Sobre nós"];
+  const navItems = [
+    { label: "Como funciona", to: null },
+    { label: "Serviços", to: ROUTES.CATEGORIES },
+    { label: "Profissionais", to: null },
+    { label: "Segurança", to: null },
+    { label: "Sobre nós", to: null },
+  ];
+
+  function handleNavClick(to: string | null) {
+    setMenuOpen(false);
+    if (to) navigate(to);
+  }
 
   useEffect(() => {
     if (!user) {
@@ -99,26 +110,25 @@ export default function HeaderAuth() {
     <header className="flex items-center justify-between px-6 py-[14px] sm:px-10 sm:py-[18px] bg-white/90 backdrop-blur-md border-b border-[#C7D1CB] sticky top-0 z-50 font-sans">
 
       {/* Logo */}
-      <div className="flex items-center gap-[6px] text-[22px] font-bold tracking-tight text-[#12233D]">
-        <button
-          onClick={handleGoHome}
-          className="flex items-center gap-[6px] text-[22px] font-bold tracking-tight text-[#12233D] bg-transparent border-none cursor-pointer p-0"
-        >
-         Three Minds
-          <span className="w-[7px] h-[7px] rounded-full bg-[#E8A33D] inline-block" />
-        </button>
-      </div>
+      <button
+        onClick={handleGoHome}
+        className="flex items-center gap-[6px] text-[22px] font-bold tracking-tight text-[#12233D] bg-transparent border-none cursor-pointer p-0"
+      >
+        servijá
+        <span className="w-[7px] h-[7px] rounded-full bg-[#E8A33D] inline-block" />
+      </button>
 
       {/* Links de navegação - escondido no mobile */}
       <nav className="hidden sm:block">
         <ul className="flex gap-7 list-none m-0 p-0">
           {navItems.map((item) => (
-            <li key={item}>
-              <a href="#"
-                className="text-[#586268] no-underline text-[15px] font-medium hover:text-[#12233D] transition-colors duration-150"
+            <li key={item.label}>
+              <button
+                onClick={() => handleNavClick(item.to)}
+                className="text-[#586268] bg-transparent border-none cursor-pointer text-[15px] font-medium hover:text-[#12233D] transition-colors duration-150 p-0"
               >
-                {item}
-              </a>
+                {item.label}
+              </button>
             </li>
           ))}
         </ul>
@@ -143,57 +153,57 @@ export default function HeaderAuth() {
         )}
 
         <div className="relative" ref={profileRef}>
-          <button
-            onClick={() => setProfileOpen((current) => !current)}
-            className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer py-1 pl-1 pr-2 rounded-full hover:bg-[#F1F4F2] transition-colors duration-150"
+        <button
+          onClick={() => setProfileOpen((current) => !current)}
+          className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer py-1 pl-1 pr-2 rounded-full hover:bg-[#F1F4F2] transition-colors duration-150"
+        >
+          <span className="w-9 h-9 rounded-full bg-[#12233D] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+            {getInitials(user?.name)}
+          </span>
+          <span className="text-[13px] font-medium text-[#12233D] max-w-[120px] truncate">
+            {user?.name ?? "Minha conta"}
+          </span>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            className={`text-[#586268] transition-transform duration-150 ${profileOpen ? "rotate-180" : ""}`}
           >
-            <span className="w-9 h-9 rounded-full bg-[#12233D] text-white flex items-center justify-center text-sm font-semibold shrink-0">
-              {getInitials(user?.name)}
-            </span>
-            <span className="text-[13px] font-medium text-[#12233D] max-w-[120px] truncate">
-              {user?.name ?? "Minha conta"}
-            </span>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              className={`text-[#586268] transition-transform duration-150 ${profileOpen ? "rotate-180" : ""}`}
-            >
-              <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
+            <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
 
-          {profileOpen && (
-            <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#C7D1CB] rounded-lg shadow-lg py-2 z-50">
-              <div className="px-4 py-2.5 border-b border-[#C7D1CB]">
-                <p className="text-sm font-semibold text-[#12233D] truncate">
-                  {user?.name ?? "Usuário"}
-                </p>
-                <p className="text-xs text-[#586268] truncate">{user?.email}</p>
-              </div>
-              <button
-                onClick={handleProfile}
-                className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
-              >
-                Meu perfil
-              </button>
-              <button
-                onClick={handleMyOrders}
-                className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
-              >
-                Meus chamados
-              </button>
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-2.5 text-sm text-red-600 bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
-              >
-                Sair
-              </button>
+        {profileOpen && (
+          <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#C7D1CB] rounded-lg shadow-lg py-2 z-50">
+            <div className="px-4 py-2.5 border-b border-[#C7D1CB]">
+              <p className="text-sm font-semibold text-[#12233D] truncate">
+                {user?.name ?? "Usuário"}
+              </p>
+              <p className="text-xs text-[#586268] truncate">{user?.email}</p>
             </div>
-          )}
+            <button
+              onClick={handleProfile}
+              className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
+            >
+              Meu perfil
+            </button>
+            <button
+              onClick={handleMyOrders}
+              className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
+            >
+              Meus chamados
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2.5 text-sm text-red-600 bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
+            >
+              Sair
+            </button>
+          </div>
+        )}
         </div>
       </div>
 
@@ -213,12 +223,13 @@ export default function HeaderAuth() {
         <div className="sm:hidden absolute top-full left-0 w-full bg-white border-b border-[#C7D1CB] flex flex-col px-6 py-5 gap-5">
           <ul className="flex flex-col gap-4 list-none m-0 p-0">
             {navItems.map((item) => (
-              <li key={item}>
-                <a href="#"
-                  className="text-[#586268] no-underline text-base font-medium hover:text-[#12233D] transition-colors duration-150"
+              <li key={item.label}>
+                <button
+                  onClick={() => handleNavClick(item.to)}
+                  className="text-[#586268] bg-transparent border-none cursor-pointer text-base font-medium hover:text-[#12233D] transition-colors duration-150 p-0"
                 >
-                  {item}
-                </a>
+                  {item.label}
+                </button>
               </li>
             ))}
           </ul>

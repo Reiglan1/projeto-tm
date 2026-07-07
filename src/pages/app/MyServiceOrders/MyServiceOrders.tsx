@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useLayout } from "@/context/LayoutProvider";
 import { getServiceOrders } from "@/services/serviceOrder";
 import { ResponseServiceOrderJason } from "@/types/serviceOrder";
 import { ApiError } from "@/services/apiError";
+import { buildPaymentPath } from "@/constants/Constants";
 
 const PAGE_SIZE = 8;
 
@@ -60,12 +62,16 @@ function OrderCard({
   order,
   counterpartLabel,
   counterpartName,
+  showPayButton,
 }: {
   order: ResponseServiceOrderJason;
   counterpartLabel: string;
   counterpartName: string;
+  showPayButton: boolean;
 }) {
+  const navigate = useNavigate();
   const status = getOrderStatusMeta(order.status);
+  const isCancelled = order.status.toUpperCase().includes("CANCEL");
 
   return (
     <div className="bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-3">
@@ -101,10 +107,19 @@ function OrderCard({
         </div>
       </div>
 
-      {order.status.toUpperCase().includes("CANCEL") && order.cancellationReason && (
+      {isCancelled && order.cancellationReason && (
         <p className="text-xs text-[#B4402A] bg-red-50 rounded-md px-3 py-2">
           Motivo do cancelamento: {order.cancellationReason}
         </p>
+      )}
+
+      {showPayButton && !isCancelled && (
+        <button
+          onClick={() => navigate(buildPaymentPath(order.id))}
+          className="w-full bg-[#12233D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150"
+        >
+          Pagar
+        </button>
       )}
     </div>
   );
@@ -189,6 +204,7 @@ export default function MyServiceOrdersPage() {
                 counterpartName={
                   user?.role === "client" ? order.workerName : order.clientName
                 }
+                showPayButton={user?.role === "client"}
               />
             ))}
           </div>

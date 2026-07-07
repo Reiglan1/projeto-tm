@@ -17,6 +17,8 @@ const ProfilePage = lazy(() => import("@/pages/app/Profile/Profile"));
 const VerificationPage = lazy(() => import("@/pages/app/Verification/Verification"));
 const OpenServiceOrderPage = lazy(() => import("@/pages/app/OpenServiceOrder/OpenServiceOrder"));
 const MyServiceOrdersPage = lazy(() => import("@/pages/app/MyServiceOrders/MyServiceOrders"));
+const PaymentPage = lazy(() => import("@/pages/app/Home/sections/Payment"));
+const CategoriesPage = lazy(() => import("@/pages/app/Home/sections/Categories"));
 const WalletPage = lazy(() => import("@/pages/app/Wallet/Wallet"));
 const HomePage = lazy(() => import("@/pages/app/Home/Home"));
 const LayoutAuth = lazy(() => import("@/pages/auth/LayoutAuth/LayoutAuth"));
@@ -110,6 +112,16 @@ const RouterConfig = createBrowserRouter([
                {
                 path: ROUTES.WALLET,
                 Component: WalletPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.CATEGORIES,
+                Component: CategoriesPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.PAYMENT,
+                Component: PaymentPage,
                 errorElement: <ErrorElement />,
               },
             ],

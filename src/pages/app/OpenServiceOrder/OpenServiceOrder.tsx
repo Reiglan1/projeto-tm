@@ -51,7 +51,7 @@ export default function OpenServiceOrderPage() {
     setLoading(true);
     setLoadError(null);
 
-    Promise.all([getWorkerProfile(workerId), getCategories(1, 50)])
+    Promise.all([getWorkerProfile(workerId), getCategories({ pageSize: 50 })])
       .then(([workerData, categoriesData]) => {
         if (cancelled) return;
         setWorker(workerData);
@@ -203,9 +203,8 @@ export default function OpenServiceOrderPage() {
               setCategoryId(event.target.value);
               setFieldErrors((current) => ({ ...current, categoryId: undefined }));
             }}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] bg-white ${
-              fieldErrors.categoryId ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] bg-white ${fieldErrors.categoryId ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
           >
             <option value="">Selecione...</option>
             {categories.map((category) => (
@@ -235,9 +234,8 @@ export default function OpenServiceOrderPage() {
               setFieldErrors((current) => ({ ...current, description: undefined }));
             }}
             rows={4}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none ${
-              fieldErrors.description ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none ${fieldErrors.description ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="Ex: Vazamento na pia da cozinha, preciso trocar o sifão."
           />
           {fieldErrors.description && (
@@ -258,9 +256,8 @@ export default function OpenServiceOrderPage() {
                 setScheduledAt(event.target.value);
                 setFieldErrors((current) => ({ ...current, scheduledAt: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.scheduledAt ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.scheduledAt ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
             />
             {fieldErrors.scheduledAt && (
               <p className="text-xs text-red-600 mt-1">{fieldErrors.scheduledAt}</p>
@@ -280,9 +277,8 @@ export default function OpenServiceOrderPage() {
                 setValue(event.target.value);
                 setFieldErrors((current) => ({ ...current, value: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.value ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.value ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
               placeholder="150.00"
             />
             {fieldErrors.value && (
@@ -302,9 +298,8 @@ export default function OpenServiceOrderPage() {
               setAddress(event.target.value);
               setFieldErrors((current) => ({ ...current, address: undefined }));
             }}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.address ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.address ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="Rua, número, bairro, cidade"
           />
           {fieldErrors.address && (

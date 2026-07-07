@@ -41,3 +41,16 @@ export async function createServiceOrder(
     throw normalizeError(error);
   }
 }
+
+export async function getServiceOrderById(
+  id: string
+): Promise<ResponseServiceOrderJason> {
+  try {
+    const { data } = await api.get<ResponseServiceOrderJason>(
+      `/api/service-orders/${id}`
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}

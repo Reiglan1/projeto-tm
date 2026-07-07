@@ -10,6 +10,9 @@ export interface ResponseWorkerDetailJason {
   emailVerified: boolean;
   available24Hours: boolean;
   profilePhotoUrl: string | null;
+  profession: string;
+  averageRating: number;
+  reviewCount: number;
   createdAt: string;
 }
 
@@ -24,5 +27,6 @@ export interface ResponseAllWorkersJason {
 export interface RequestUpdateWorkerJason {
   name: string;
   phone: string;
+  profession: string;
   available24Hours: boolean;
 }

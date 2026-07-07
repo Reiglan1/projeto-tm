@@ -13,6 +13,10 @@ export const ROUTES = {
 
     WALLET: "/carteira",
 
+    CATEGORIES: "/servicos",
+
+    PAYMENT: "/pagamento/:serviceOrderId",
+
     // Páginas que não estão logadas
     LOGIN: "/login",
 
@@ -23,6 +27,10 @@ export const ROUTES = {
 // Monta o caminho de "abrir chamado" já com o id do profissional escolhido
 export function buildOpenServiceOrderPath(workerId: string): string {
     return `/abrir-chamado/${workerId}`;
+}
+
+export function buildPaymentPath(serviceOrderId: string): string {
+    return `/pagamento/${serviceOrderId}`;
 }
 
 // // Mapeamento de rotas para nomes de páginas (para breadcrumbs)

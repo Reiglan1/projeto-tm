@@ -64,3 +64,14 @@ export interface AuthenticatedUser {
 export interface RequestDeleteAccountJason {
   password: string;
 }
+
+export interface RequestWorkerJason {
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+  profession: string;
+  password: string;
+  confirmPassword: string;
+  acceptTerms: boolean;
+}
