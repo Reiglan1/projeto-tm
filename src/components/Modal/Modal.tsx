@@ -27,13 +27,9 @@ export default function Modal({ open, onClose, title, children }: ModalProps) {
   if (!open) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#12233D]/50 backdrop-blur-sm px-4"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#12233D]/50 backdrop-blur-sm px-4">
       <div
         className="w-full max-w-md bg-white rounded-xl shadow-xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto"
-        onClick={(event) => event.stopPropagation()}
         role="dialog"
         aria-modal="true"
       >

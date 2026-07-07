@@ -16,6 +16,7 @@ import { isValidPhone, onlyDigits } from "@/utils/Validators";
 import { maskPhone } from "@/utils/Masks";
 import { ResponseCategoryJason } from "@/types/category";
 import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
+import EmailVerificationModal from "@/components/EmailVerificationModal/EmailVerificationModal";
 
 interface ProfileState {
   name: string;
@@ -75,6 +76,8 @@ export default function ProfilePage() {
   const [deletePassword, setDeletePassword] = useState("");
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -160,6 +163,11 @@ export default function ProfilePage() {
       cancelled = true;
     };
   }, [user?.role]);
+
+  function handleEmailVerified() {
+    setShowVerificationModal(false);
+    setProfile((current) => (current ? { ...current, emailVerified: true } : current));
+  }
 
   function handleCategoriesChange(ids: string[]) {
     setCategoryIds(ids);
@@ -321,6 +329,15 @@ export default function ProfilePage() {
           >
             {profile.emailVerified ? "E-mail verificado" : "E-mail não verificado"}
           </span>
+          {!profile.emailVerified && (
+            <button
+              type="button"
+              onClick={() => setShowVerificationModal(true)}
+              className="text-[11px] font-semibold uppercase tracking-wide text-[#3E6990] bg-transparent border-none cursor-pointer underline"
+            >
+              Verificar
+            </button>
+          )}
           {user?.role === "worker" && profile.verificationStatus && (
             <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#3E6990]/10 text-[#3E6990] px-2.5 py-1 rounded-full">
               {profile.verificationStatus}
@@ -507,6 +524,15 @@ export default function ProfilePage() {
           </form>
         )}
       </div>
+      {user && (
+        <EmailVerificationModal
+          open={showVerificationModal}
+          email={profile.email}
+          role={user.role}
+          onClose={() => setShowVerificationModal(false)}
+          onVerified={handleEmailVerified}
+        />
+      )}
     </div>
   );
 }

@@ -3,6 +3,8 @@ import { ApiError, normalizeError } from "./apiError";
 import {
   RequestClientJason,
   RequestLoginJason,
+  RequestResendVerificationJason,
+  RequestVerifyEmailJason,
   RequestWorkerJason,
   ResponseClientJason,
   ResponseWorkerJason,
@@ -65,3 +67,24 @@ export async function registerWorker(
     throw normalizeError(error);
   }
 }
+
+export async function verifyEmail(
+  payload: RequestVerifyEmailJason
+): Promise<void> {
+  try {
+    await api.post("/api/auth/verify-email", payload);
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function resendVerification(
+  payload: RequestResendVerificationJason
+): Promise<void> {
+  try {
+    await api.post("/api/auth/resend-verification", payload);
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+

@@ -4,7 +4,15 @@ import Modal from "@/components/Modal/Modal";
 import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 import RoleTabs from "./RoleTabs";
 import { useLayout } from "@/context/LayoutProvider";
-import { registerClient, registerWorker, ApiError } from "@/services/auth";
+import {
+  registerClient,
+  registerWorker,
+  loginClient,
+  loginWorker,
+  verifyEmail,
+  resendVerification,
+  ApiError,
+} from "@/services/auth";
 import { getCategories } from "@/services/categories";
 import { RequestClientJason, RequestWorkerJason, UserRole } from "@/types/auth";
 import { ResponseCategoryJason } from "@/types/category";
@@ -17,6 +25,8 @@ import {
   onlyDigits,
 } from "@/utils/Validators";
 import { maskCPF, maskPhone } from "@/utils/Masks";
+
+const RESEND_COOLDOWN_SECONDS = 30;
 
 interface RegisterModalProps {
   open: boolean;
@@ -39,6 +49,7 @@ const initialForm = {
 
 type FormField = keyof typeof initialForm;
 type FieldErrors = Partial<Record<FormField, string>>;
+type Step = "register" | "verify";
 
 export default function RegisterModal({
   open,
@@ -49,6 +60,7 @@ export default function RegisterModal({
   const navigate = useNavigate();
   const { login } = useLayout();
 
+  const [step, setStep] = useState<Step>("register");
   const [role, setRole] = useState<UserRole>(defaultRole);
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
@@ -58,6 +70,14 @@ export default function RegisterModal({
 
   const [categories, setCategories] = useState<ResponseCategoryJason[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
+
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(0);
 
   useEffect(() => {
     if (open) {
@@ -90,6 +110,12 @@ export default function RegisterModal({
     };
   }, [open, role, categories.length]);
 
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timeout = setTimeout(() => setCooldown((current) => current - 1), 1000);
+    return () => clearTimeout(timeout);
+  }, [cooldown]);
+
   function updateField<K extends FormField>(
     field: K,
     value: (typeof initialForm)[K]
@@ -99,24 +125,17 @@ export default function RegisterModal({
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
   }
 
-  // function toggleCategory(categoryId: string) {
-  //   setForm((current) => {
-  //     const alreadySelected = current.categoryIds.includes(categoryId);
-  //     return {
-  //       ...current,
-  //       categoryIds: alreadySelected
-  //         ? current.categoryIds.filter((id) => id !== categoryId)
-  //         : [...current.categoryIds, categoryId],
-  //     };
-  //   });
-  //   setFieldErrors((current) => ({ ...current, categoryIds: undefined }));
-  // }
-
   function resetAndClose() {
+    setStep("register");
     setForm(initialForm);
     setFieldErrors({});
     setFormError(null);
     setLoading(false);
+    setConfirmationMessage(null);
+    setCode("");
+    setVerifyError(null);
+    setResendMessage(null);
+    setCooldown(0);
     onClose();
   }
 
@@ -176,6 +195,17 @@ export default function RegisterModal({
           ? await registerClient(buildClientPayload())
           : await registerWorker(buildWorkerPayload());
 
+      // O backend pode devolver token vazio quando a conta ainda precisa
+      // confirmar o e-mail antes de poder logar de verdade.
+      if (!response.token) {
+        setConfirmationMessage(
+          response.message ??
+            "Cadastro realizado! Confirme seu e-mail para poder entrar."
+        );
+        setStep("verify");
+        return;
+      }
+
       login(response.token, {
         id: response.id,
         name: response.name,
@@ -190,6 +220,63 @@ export default function RegisterModal({
       setFormError(apiError.messages?.join(" ") ?? "Não foi possível cadastrar");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleVerifyAndLogin(event: FormEvent) {
+    event.preventDefault();
+    setVerifyError(null);
+
+    if (!code.trim()) {
+      setVerifyError("Informe o código recebido por e-mail");
+      return;
+    }
+
+    setVerifying(true);
+
+    try {
+      await verifyEmail({ email: form.email, userType: role, code: code.trim() });
+
+      // Confirmado o e-mail, já loga com a senha que a pessoa acabou de criar.
+      const response =
+        role === "client"
+          ? await loginClient({ email: form.email, password: form.password })
+          : await loginWorker({ email: form.email, password: form.password });
+
+      login(response.token, {
+        id: response.id,
+        name: response.name,
+        email: response.email,
+        role,
+      });
+
+      resetAndClose();
+      navigate("/");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setVerifyError(apiError.messages?.join(" ") ?? "Código inválido");
+    } finally {
+      setVerifying(false);
+    }
+  }
+
+  async function handleResend() {
+    if (cooldown > 0) return;
+    setResendMessage(null);
+    setVerifyError(null);
+    setResending(true);
+
+    try {
+      await resendVerification({ email: form.email, userType: role });
+      setResendMessage("Enviamos um novo código para o seu e-mail.");
+      setCooldown(RESEND_COOLDOWN_SECONDS);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setVerifyError(
+        apiError.messages?.join(" ") ?? "Não foi possível reenviar o código"
+      );
+    } finally {
+      setResending(false);
     }
   }
 
@@ -222,6 +309,62 @@ export default function RegisterModal({
   }
 
   const passwordRules = checkPasswordRules(form.password);
+
+  if (step === "verify") {
+    return (
+      <Modal open={open} onClose={resetAndClose} title="Confirme seu e-mail">
+        <p className="text-sm text-[#586268] mb-5">
+          {confirmationMessage}
+        </p>
+
+        <form onSubmit={handleVerifyAndLogin} noValidate className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              Código de verificação
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={code}
+              onChange={(event) => setCode(event.target.value)}
+              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] tracking-[4px] text-center focus:outline-none focus:border-[#12233D]"
+              placeholder="000000"
+              autoFocus
+            />
+          </div>
+
+          {verifyError && <p className="text-sm text-red-600">{verifyError}</p>}
+          {resendMessage && (
+            <p className="text-sm text-[#2F6E48]">{resendMessage}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={verifying}
+            className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {verifying ? "Verificando..." : "Confirmar e entrar"}
+          </button>
+        </form>
+
+        <p className="text-sm text-[#586268] text-center mt-5">
+          Não recebeu?{" "}
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={resending || cooldown > 0}
+            className="text-[#12233D] font-semibold bg-transparent border-none cursor-pointer p-0 underline disabled:no-underline disabled:text-[#586268] disabled:cursor-not-allowed"
+          >
+            {cooldown > 0
+              ? `Reenviar em ${cooldown}s`
+              : resending
+              ? "Enviando..."
+              : "Reenviar código"}
+          </button>
+        </p>
+      </Modal>
+    );
+  }
 
   return (
     <Modal open={open} onClose={resetAndClose} title="Criar conta">

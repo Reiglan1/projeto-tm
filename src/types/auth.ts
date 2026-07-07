@@ -68,3 +68,14 @@ export interface AuthenticatedUser {
 export interface RequestDeleteAccountJason {
   password: string;
 }
+
+export interface RequestVerifyEmailJason {
+  email: string;
+  userType: UserRole;
+  code: string;
+}
+
+export interface RequestResendVerificationJason {
+  email: string;
+  userType: UserRole;
+}
