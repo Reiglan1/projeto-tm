@@ -1,5 +1,10 @@
 // Tipos baseados no OpenAPI da ProductClientHub.API (recurso Workers)
 
+export interface ResponseWorkerProfessionJason {
+  categoryId: string;
+  name: string;
+}
+
 export interface ResponseWorkerDetailJason {
   id: string;
   name: string;
@@ -10,7 +15,8 @@ export interface ResponseWorkerDetailJason {
   emailVerified: boolean;
   available24Hours: boolean;
   profilePhotoUrl: string | null;
-  profession: string;
+  description: string | null;
+  professions: ResponseWorkerProfessionJason[];
   averageRating: number;
   reviewCount: number;
   createdAt: string;
@@ -27,6 +33,7 @@ export interface ResponseAllWorkersJason {
 export interface RequestUpdateWorkerJason {
   name: string;
   phone: string;
-  profession: string;
+  categoryIds: string[];
+  description?: string;
   available24Hours: boolean;
 }

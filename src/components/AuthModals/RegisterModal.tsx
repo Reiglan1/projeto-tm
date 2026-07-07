@@ -1,10 +1,13 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal/Modal";
+import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 import RoleTabs from "./RoleTabs";
 import { useLayout } from "@/context/LayoutProvider";
 import { registerClient, registerWorker, ApiError } from "@/services/auth";
+import { getCategories } from "@/services/categories";
 import { RequestClientJason, RequestWorkerJason, UserRole } from "@/types/auth";
+import { ResponseCategoryJason } from "@/types/category";
 import {
   isValidEmail,
   isValidCPF,
@@ -27,7 +30,8 @@ const initialForm = {
   email: "",
   cpf: "",
   phone: "",
-  profession: "",
+  categoryIds: [] as string[],
+  description: "",
   password: "",
   confirmPassword: "",
   acceptTerms: false,
@@ -52,11 +56,39 @@ export default function RegisterModal({
   const [formError, setFormError] = useState<string | null>(null);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  const [categories, setCategories] = useState<ResponseCategoryJason[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+
   useEffect(() => {
     if (open) {
       setRole(defaultRole);
     }
   }, [open, defaultRole]);
+
+  // Busca as categorias só quando o modal abre e o profissional precisa
+  // escolher — evita chamada desnecessária pra quem só quer logar como cliente.
+  useEffect(() => {
+    if (!open || role !== "worker" || categories.length > 0) return;
+
+    let cancelled = false;
+    setCategoriesLoading(true);
+
+    getCategories({ pageSize: 100 })
+      .then((response) => {
+        if (!cancelled) setCategories(response.items ?? []);
+      })
+      .catch(() => {
+        // Se não conseguir carregar, o multi-select fica vazio e o usuário
+        // vê a mensagem de "nenhuma categoria" — não é um erro bloqueante.
+      })
+      .finally(() => {
+        if (!cancelled) setCategoriesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, role, categories.length]);
 
   function updateField<K extends FormField>(
     field: K,
@@ -65,6 +97,19 @@ export default function RegisterModal({
     setForm((current) => ({ ...current, [field]: value }));
     // limpa o erro do campo assim que o usuário começa a corrigir
     setFieldErrors((current) => ({ ...current, [field]: undefined }));
+  }
+
+  function toggleCategory(categoryId: string) {
+    setForm((current) => {
+      const alreadySelected = current.categoryIds.includes(categoryId);
+      return {
+        ...current,
+        categoryIds: alreadySelected
+          ? current.categoryIds.filter((id) => id !== categoryId)
+          : [...current.categoryIds, categoryId],
+      };
+    });
+    setFieldErrors((current) => ({ ...current, categoryIds: undefined }));
   }
 
   function resetAndClose() {
@@ -96,8 +141,8 @@ export default function RegisterModal({
       errors.phone = "Telefone inválido";
     }
 
-    if (role === "worker" && !form.profession.trim()) {
-      errors.profession = "Informe sua profissão";
+    if (role === "worker" && form.categoryIds.length === 0) {
+      errors.categoryIds = "Escolha ao menos uma categoria de serviço";
     }
 
     if (!isValidPassword(form.password)) {
@@ -168,7 +213,8 @@ export default function RegisterModal({
       email: form.email,
       cpf: onlyDigits(form.cpf),
       phone: onlyDigits(form.phone),
-      profession: form.profession,
+      categoryIds: form.categoryIds,
+      description: form.description || undefined,
       password: form.password,
       confirmPassword: form.confirmPassword,
       acceptTerms: form.acceptTerms,
@@ -262,27 +308,40 @@ export default function RegisterModal({
         </div>
 
         {role === "worker" && (
-          <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-              Profissão
-            </label>
-            <input
-              type="text"
-              value={form.profession}
-              onChange={(event) =>
-                updateField("profession", event.target.value)
-              }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.profession ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
-              placeholder="Ex: Eletricista, Encanador, Diarista"
-            />
-            {fieldErrors.profession && (
-              <p className="text-xs text-red-600 mt-1">
-                {fieldErrors.profession}
-              </p>
-            )}
-          </div>
+          <>
+            <div>
+              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+                Categorias de serviço
+              </label>
+              <CategoryPicker
+                categories={categories}
+                selectedIds={form.categoryIds}
+                onChange={(ids) => updateField("categoryIds", ids)}
+                loading={categoriesLoading}
+                hasError={Boolean(fieldErrors.categoryIds)}
+              />
+              {fieldErrors.categoryIds && (
+                <p className="text-xs text-red-600 mt-1">
+                  {fieldErrors.categoryIds}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+                Sobre você <span className="text-[#586268] font-normal">(opcional)</span>
+              </label>
+              <textarea
+                value={form.description}
+                onChange={(event) =>
+                  updateField("description", event.target.value)
+                }
+                rows={3}
+                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+                placeholder="Conte um pouco da sua experiência para os clientes"
+              />
+            </div>
+          </>
         )}
 
         <div>

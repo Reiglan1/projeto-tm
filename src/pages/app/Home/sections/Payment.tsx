@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import { useLayout } from "@/context/LayoutProvider";
 import { getServiceOrderById } from "@/services/serviceOrder";
 import {
@@ -23,6 +24,9 @@ function paymentStatusLabel(payment: PaymentRecord): { label: string; className:
   if (raw.includes("APPROV") || raw.includes("PAID") || raw.includes("SUCCESS")) {
     return { label: "Pagamento aprovado", className: "bg-[#3F8F5F]/10 text-[#2F6E48]" };
   }
+  if (raw.includes("ESCROW")) {
+    return { label: "Pago — retido até concluir o serviço", className: "bg-[#3E6990]/10 text-[#3E6990]" };
+  }
   if (raw.includes("REJECT") || raw.includes("FAIL") || raw.includes("CANCEL")) {
     return { label: "Pagamento não aprovado", className: "bg-red-50 text-red-600" };
   }
@@ -44,6 +48,19 @@ export default function PaymentPage() {
 
   const [refreshing, setRefreshing] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopyPixCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Alguns navegadores/contextos bloqueiam a Clipboard API (ex: sem HTTPS).
+      // Nesse caso o usuário ainda pode selecionar o texto manualmente.
+    }
+  }
 
   useEffect(() => {
     if (!serviceOrderId) return;
@@ -217,12 +234,18 @@ export default function PaymentPage() {
             {paymentStatusLabel(payment).label}
           </span>
 
-          {payment.qrCodeBase64 && (
+          {payment.qrCodeBase64 ? (
             <img
               src={`data:image/png;base64,${payment.qrCodeBase64}`}
               alt="QR Code do PIX"
               className="w-48 h-48 mx-auto"
             />
+          ) : (
+            payment.qrCode && (
+              <div className="flex justify-center p-4 bg-white">
+                <QRCodeSVG value={payment.qrCode} size={192} />
+              </div>
+            )
           )}
 
           {payment.qrCode && (
@@ -237,11 +260,19 @@ export default function PaymentPage() {
                 className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-xs text-[#586268] resize-none"
                 onClick={(event) => event.currentTarget.select()}
               />
+              <button
+                type="button"
+                onClick={() => handleCopyPixCode(payment.qrCode!)}
+                className="mt-2 w-full bg-transparent border border-[#12233D] text-[#12233D] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#12233D] hover:text-white transition-colors duration-150"
+              >
+                {copied ? "Código copiado!" : "Copiar código PIX"}
+              </button>
             </div>
           )}
 
           {(payment.ticketUrl || payment.paymentUrl) && (
-            <a href={payment.ticketUrl ?? payment.paymentUrl}
+            
+              <a href={payment.ticketUrl ?? payment.paymentUrl}
               target="_blank"
               rel="noreferrer"
               className="text-sm text-[#3E6990] font-medium underline"

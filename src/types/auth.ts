@@ -24,6 +24,8 @@ export interface RequestWorkerJason {
   email: string;
   cpf: string;
   phone: string;
+  categoryIds: string[];
+  description?: string;
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;
@@ -37,6 +39,7 @@ export interface ResponseClientJason {
   email: string;
   token: string;
   refreshToken: string;
+  message?: string;
 }
 
 export interface ResponseWorkerJason {
@@ -45,6 +48,7 @@ export interface ResponseWorkerJason {
   email: string;
   token: string;
   refreshToken: string;
+  message?: string;
 }
 
 export type ResponseAuthJason = ResponseClientJason | ResponseWorkerJason;
@@ -63,15 +67,4 @@ export interface AuthenticatedUser {
 
 export interface RequestDeleteAccountJason {
   password: string;
-}
-
-export interface RequestWorkerJason {
-  name: string;
-  email: string;
-  cpf: string;
-  phone: string;
-  profession: string;
-  password: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
 }

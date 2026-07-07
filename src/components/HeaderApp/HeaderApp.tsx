@@ -114,7 +114,7 @@ export default function HeaderAuth() {
         onClick={handleGoHome}
         className="flex items-center gap-[6px] text-[22px] font-bold tracking-tight text-[#12233D] bg-transparent border-none cursor-pointer p-0"
       >
-        servijá
+        Three Minds
         <span className="w-[7px] h-[7px] rounded-full bg-[#E8A33D] inline-block" />
       </button>
 

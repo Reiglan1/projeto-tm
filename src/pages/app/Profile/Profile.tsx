@@ -10,9 +10,12 @@ import {
   deleteClientAccount,
   deleteWorkerAccount,
 } from "@/services/profile";
+import { getCategories } from "@/services/categories";
 import { ApiError } from "@/services/apiError";
 import { isValidPhone, onlyDigits } from "@/utils/Validators";
 import { maskPhone } from "@/utils/Masks";
+import { ResponseCategoryJason } from "@/types/category";
+import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 
 interface ProfileState {
   name: string;
@@ -23,7 +26,8 @@ interface ProfileState {
   createdAt: string;
   verificationStatus?: string;
   available24Hours?: boolean;
-  profession?: string;
+  description?: string | null;
+  categoryIds?: string[];
   averageRating?: number;
   reviewCount?: number;
 }
@@ -31,7 +35,7 @@ interface ProfileState {
 interface FieldErrors {
   name?: string;
   phone?: string;
-  profession?: string;
+  categoryIds?: string;
 }
 
 function formatDate(value: string): string {
@@ -56,12 +60,16 @@ export default function ProfilePage() {
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [profession, setProfession] = useState("");
+  const [description, setDescription] = useState("");
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [available24Hours, setAvailable24Hours] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const [categories, setCategories] = useState<ResponseCategoryJason[]>([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
 
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
@@ -78,30 +86,31 @@ export default function ProfilePage() {
     const request: Promise<ProfileState> =
       user.role === "client"
         ? getClientProfile(user.id).then(
-            (data): ProfileState => ({
-              name: data.name,
-              email: data.email,
-              phone: data.phone,
-              status: data.status,
-              emailVerified: data.emailVerified,
-              createdAt: data.createdAt,
-            })
-          )
+          (data): ProfileState => ({
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            status: data.status,
+            emailVerified: data.emailVerified,
+            createdAt: data.createdAt,
+          })
+        )
         : getWorkerProfile(user.id).then(
-            (data): ProfileState => ({
-              name: data.name,
-              email: data.email,
-              phone: data.phone,
-              status: data.status,
-              emailVerified: data.emailVerified,
-              createdAt: data.createdAt,
-              verificationStatus: data.verificationStatus,
-              available24Hours: data.available24Hours,
-              profession: data.profession,
-              averageRating: data.averageRating,
-              reviewCount: data.reviewCount,
-            })
-          );
+          (data): ProfileState => ({
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            status: data.status,
+            emailVerified: data.emailVerified,
+            createdAt: data.createdAt,
+            verificationStatus: data.verificationStatus,
+            available24Hours: data.available24Hours,
+            description: data.description,
+            categoryIds: (data.professions ?? []).map((p) => p.categoryId),
+            averageRating: data.averageRating,
+            reviewCount: data.reviewCount,
+          })
+        );
 
     request
       .then((data) => {
@@ -109,7 +118,8 @@ export default function ProfilePage() {
         setProfile(data);
         setName(data.name);
         setPhone(maskPhone(data.phone));
-        setProfession(data.profession ?? "");
+        setDescription(data.description ?? "");
+        setCategoryIds(data.categoryIds ?? []);
         setAvailable24Hours(Boolean(data.available24Hours));
       })
       .catch((error: unknown) => {
@@ -128,12 +138,40 @@ export default function ProfilePage() {
     };
   }, [user]);
 
+  // Categorias só interessam ao profissional, então só busca nesse caso.
+  useEffect(() => {
+    if (user?.role !== "worker") return;
+
+    let cancelled = false;
+    setCategoriesLoading(true);
+
+    getCategories({ pageSize: 100 })
+      .then((response) => {
+        if (!cancelled) setCategories(response.items ?? []);
+      })
+      .catch(() => {
+        // Sem categorias disponíveis não bloqueia a tela, só limita a escolha.
+      })
+      .finally(() => {
+        if (!cancelled) setCategoriesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.role]);
+
+  function handleCategoriesChange(ids: string[]) {
+    setCategoryIds(ids);
+    setFieldErrors((current) => ({ ...current, categoryIds: undefined }));
+  }
+
   function validate(): FieldErrors {
     const errors: FieldErrors = {};
     if (!name.trim()) errors.name = "Informe seu nome";
     if (!isValidPhone(phone)) errors.phone = "Telefone inválido";
-    if (user?.role === "worker" && !profession.trim()) {
-      errors.profession = "Informe sua profissão";
+    if (user?.role === "worker" && categoryIds.length === 0) {
+      errors.categoryIds = "Escolha ao menos uma categoria de serviço";
     }
     return errors;
   }
@@ -162,18 +200,20 @@ export default function ProfilePage() {
         const updated = await updateWorkerProfile(user.id, {
           name,
           phone: onlyDigits(phone),
-          profession,
+          categoryIds,
+          description: description || undefined,
           available24Hours,
         });
         setProfile((current) =>
           current
             ? {
-                ...current,
-                name: updated.name,
-                phone: updated.phone,
-                profession: updated.profession,
-                available24Hours: updated.available24Hours,
-              }
+              ...current,
+              name: updated.name,
+              phone: updated.phone,
+              description: updated.description,
+              categoryIds: (updated.professions ?? []).map((p) => p.categoryId),
+              available24Hours: updated.available24Hours,
+            }
             : current
         );
       }
@@ -274,11 +314,10 @@ export default function ProfilePage() {
             {profile.status}
           </span>
           <span
-            className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
-              profile.emailVerified
-                ? "bg-[#3F8F5F]/10 text-[#2F6E48]"
-                : "bg-[#E8A33D]/15 text-[#C97F1E]"
-            }`}
+            className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${profile.emailVerified
+              ? "bg-[#3F8F5F]/10 text-[#2F6E48]"
+              : "bg-[#E8A33D]/15 text-[#C97F1E]"
+              }`}
           >
             {profile.emailVerified ? "E-mail verificado" : "E-mail não verificado"}
           </span>
@@ -306,9 +345,8 @@ export default function ProfilePage() {
                 setName(event.target.value);
                 setFieldErrors((current) => ({ ...current, name: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
             />
             {fieldErrors.name && (
               <p className="text-xs text-red-600 mt-1">{fieldErrors.name}</p>
@@ -342,9 +380,8 @@ export default function ProfilePage() {
                 setPhone(maskPhone(event.target.value));
                 setFieldErrors((current) => ({ ...current, phone: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
               placeholder="(00) 00000-0000"
             />
             {fieldErrors.phone && (
@@ -355,23 +392,33 @@ export default function ProfilePage() {
           {user?.role === "worker" && (
             <div>
               <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-                Profissão
+                Categorias de serviço
               </label>
-              <input
-                type="text"
-                value={profession}
-                onChange={(event) => {
-                  setProfession(event.target.value);
-                  setFieldErrors((current) => ({ ...current, profession: undefined }));
-                }}
-                className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                  fieldErrors.profession ? "border-red-400" : "border-[#C7D1CB]"
-                }`}
-                placeholder="Ex: Eletricista, Encanador, Diarista"
+              <CategoryPicker
+                categories={categories}
+                selectedIds={categoryIds}
+                onChange={handleCategoriesChange}
+                loading={categoriesLoading}
+                hasError={Boolean(fieldErrors.categoryIds)}
               />
-              {fieldErrors.profession && (
-                <p className="text-xs text-red-600 mt-1">{fieldErrors.profession}</p>
+              {fieldErrors.categoryIds && (
+                <p className="text-xs text-red-600 mt-1">{fieldErrors.categoryIds}</p>
               )}
+            </div>
+          )}
+
+          {user?.role === "worker" && (
+            <div>
+              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+                Sobre você <span className="text-[#586268] font-normal">(opcional)</span>
+              </label>
+              <textarea
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                rows={3}
+                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+                placeholder="Conte um pouco da sua experiência para os clientes"
+              />
             </div>
           )}
 

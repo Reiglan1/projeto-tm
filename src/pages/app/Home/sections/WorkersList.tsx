@@ -65,6 +65,7 @@ function WorkerCard({
   const status = getStatusMeta(worker.status);
   const verification = getVerificationMeta(worker.verificationStatus);
   const hasReviews = worker.reviewCount > 0;
+  const hasDescription = Boolean(worker.description?.trim());
 
   return (
     <div className="group bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5">
@@ -100,8 +101,10 @@ function WorkerCard({
           <p className="text-[15px] font-semibold text-[#12233D] truncate">
             {worker.name}
           </p>
-          {worker.profession && (
-            <p className="text-xs text-[#586268] truncate">{worker.profession}</p>
+          {worker.professions && worker.professions.length > 0 && (
+            <p className="text-xs text-[#586268] truncate">
+              {worker.professions.map((p) => p.name).join(", ")}
+            </p>
           )}
           <p
             className={`text-xs font-medium mt-0.5 ${
@@ -116,6 +119,10 @@ function WorkerCard({
           </p>
         </div>
       </div>
+
+      {hasDescription && (
+        <p className="text-sm text-[#586268] line-clamp-2">{worker.description}</p>
+      )}
 
       <div className="flex items-center gap-4 text-sm text-[#586268]">
         <span className="flex items-center gap-2">
