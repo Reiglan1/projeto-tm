@@ -1,7 +1,9 @@
 import api from "./api";
 import { normalizeError } from "./apiError";
 import {
+  RequestCancelServiceOrderJason,
   RequestCreateServiceOrderJason,
+  RequestUpdateServiceOrderStatusJason,
   ResponseAllServiceOrdersJason,
   ResponseServiceOrderJason,
 } from "@/types/serviceOrder";
@@ -48,6 +50,36 @@ export async function getServiceOrderById(
   try {
     const { data } = await api.get<ResponseServiceOrderJason>(
       `/api/service-orders/${id}`
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function cancelServiceOrder(
+  id: string,
+  payload: RequestCancelServiceOrderJason
+): Promise<ResponseServiceOrderJason> {
+  try {
+    const { data } = await api.patch<ResponseServiceOrderJason>(
+      `/api/service-orders/${id}/cancel`,
+      payload
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function updateServiceOrderStatus(
+  id: string,
+  payload: RequestUpdateServiceOrderStatusJason
+): Promise<ResponseServiceOrderJason> {
+  try {
+    const { data } = await api.patch<ResponseServiceOrderJason>(
+      `/api/service-orders/${id}/status`,
+      payload
     );
     return data;
   } catch (error) {

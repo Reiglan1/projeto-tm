@@ -36,3 +36,11 @@ export interface ResponseAllServiceOrdersJason {
   pageSize: number;
   totalPages: number;
 }
+
+export interface RequestCancelServiceOrderJason {
+  cancellationReason: string;
+}
+
+export interface RequestUpdateServiceOrderStatusJason {
+  status: string;
+}

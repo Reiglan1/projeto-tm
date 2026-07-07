@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLayout } from "@/context/LayoutProvider";
-import { getServiceOrders } from "@/services/serviceOrder";
+import {
+  getServiceOrders,
+  cancelServiceOrder,
+  updateServiceOrderStatus,
+} from "@/services/serviceOrder";
+import { createReview, getReviewsByServiceOrder } from "@/services/reviews";
 import { ResponseServiceOrderJason } from "@/types/serviceOrder";
+import { ResponseReviewJason } from "@/types/review";
 import { ApiError } from "@/services/apiError";
 import { buildPaymentPath } from "@/constants/Constants";
+import { SERVICE_ORDER_STATUS } from "@/constants/ServiceOrderStatus";
+import Modal from "@/components/Modal/Modal";
+import StarRating from "@/components/StarRating/StarRating";
 
 const PAGE_SIZE = 8;
 
@@ -14,26 +23,37 @@ interface StatusMeta {
   textClass: string;
 }
 
-// A spec não documenta os valores possíveis desse enum além dos que já vimos
-// funcionando na prática (ver observação abaixo). Ajuste conforme for testando.
 function getOrderStatusMeta(status: string): StatusMeta {
   switch (status.toUpperCase()) {
-    case "COMPLETED":
-    case "FINISHED":
-    case "DONE":
+    case SERVICE_ORDER_STATUS.COMPLETED:
       return { label: "Concluído", dotClass: "bg-[#3F8F5F]", textClass: "text-[#2F6E48]" };
-    case "IN_PROGRESS":
-    case "ACCEPTED":
-    case "ONGOING":
+    case SERVICE_ORDER_STATUS.IN_PROGRESS:
       return { label: "Em andamento", dotClass: "bg-[#3E6990]", textClass: "text-[#3E6990]" };
-    case "CANCELLED":
-    case "CANCELED":
+    case SERVICE_ORDER_STATUS.ACCEPTED:
+      return { label: "Aceito", dotClass: "bg-[#3E6990]", textClass: "text-[#3E6990]" };
+    case SERVICE_ORDER_STATUS.CANCELLED:
       return { label: "Cancelado", dotClass: "bg-[#B4402A]", textClass: "text-[#B4402A]" };
-    case "DISPUTED":
+    case SERVICE_ORDER_STATUS.DISPUTED:
       return { label: "Em disputa", dotClass: "bg-[#B4402A]", textClass: "text-[#B4402A]" };
-    case "PENDING":
+    case SERVICE_ORDER_STATUS.PENDING:
     default:
       return { label: status || "Pendente", dotClass: "bg-[#C97F1E]", textClass: "text-[#C97F1E]" };
+  }
+}
+
+// Próxima ação disponível pro profissional, dado o status atual.
+function getNextWorkerAction(
+  status: string
+): { label: string; nextStatus: string } | null {
+  switch (status.toUpperCase()) {
+    case SERVICE_ORDER_STATUS.PENDING:
+      return { label: "Aceitar chamado", nextStatus: SERVICE_ORDER_STATUS.ACCEPTED };
+    case SERVICE_ORDER_STATUS.ACCEPTED:
+      return { label: "Iniciar serviço", nextStatus: SERVICE_ORDER_STATUS.IN_PROGRESS };
+    case SERVICE_ORDER_STATUS.IN_PROGRESS:
+      return { label: "Concluir chamado", nextStatus: SERVICE_ORDER_STATUS.COMPLETED };
+    default:
+      return null;
   }
 }
 
@@ -63,15 +83,137 @@ function OrderCard({
   counterpartLabel,
   counterpartName,
   showPayButton,
+  isWorker,
+  currentUserId,
+  onUpdated,
 }: {
   order: ResponseServiceOrderJason;
   counterpartLabel: string;
   counterpartName: string;
   showPayButton: boolean;
+  isWorker: boolean;
+  currentUserId?: string;
+  onUpdated: (updated: ResponseServiceOrderJason) => void;
 }) {
   const navigate = useNavigate();
   const status = getOrderStatusMeta(order.status);
-  const isCancelled = order.status.toUpperCase().includes("CANCEL");
+  const upperStatus = order.status.toUpperCase();
+  const isCancelled = upperStatus === SERVICE_ORDER_STATUS.CANCELLED;
+  const isCompleted = upperStatus === SERVICE_ORDER_STATUS.COMPLETED;
+  const canCancel = !isCancelled && !isCompleted;
+  const nextAction = isWorker ? getNextWorkerAction(order.status) : null;
+
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const [reason, setReason] = useState("");
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+
+  const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [statusError, setStatusError] = useState<string | null>(null);
+
+  const [myReview, setMyReview] = useState<ResponseReviewJason | null>(null);
+  const [checkingReview, setCheckingReview] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isCompleted || !currentUserId) return;
+
+    let cancelled = false;
+    setCheckingReview(true);
+
+    getReviewsByServiceOrder(order.id)
+      .then((reviews) => {
+        if (cancelled) return;
+        const mine = reviews.find((review) => review.reviewerId === currentUserId);
+        setMyReview(mine ?? null);
+      })
+      .catch(() => {
+        // Falha silenciosa: pior caso o botão de avaliar aparece de novo.
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingReview(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isCompleted, currentUserId, order.id]);
+
+  async function handleSubmitReview(event: FormEvent) {
+    event.preventDefault();
+    if (rating < 1) {
+      setReviewError("Escolha de 1 a 5 estrelas");
+      return;
+    }
+
+    setReviewError(null);
+    setSubmittingReview(true);
+
+    try {
+      const created = await createReview({
+        serviceOrderId: order.id,
+        rating,
+        comment: comment.trim() || undefined,
+      });
+      setMyReview(created);
+      setShowReviewModal(false);
+      setRating(0);
+      setComment("");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setReviewError(
+        apiError.messages?.join(" ") ?? "Não foi possível enviar sua avaliação"
+      );
+    } finally {
+      setSubmittingReview(false);
+    }
+  }
+
+  async function handleConfirmCancel(event: FormEvent) {
+    event.preventDefault();
+    setCancelError(null);
+    setCancelling(true);
+
+    try {
+      const updated = await cancelServiceOrder(order.id, {
+        cancellationReason: reason.trim() || "Cancelado pelo usuário",
+      });
+      onUpdated(updated);
+      setConfirmingCancel(false);
+      setReason("");
+    } catch (error) {
+      const apiError = error as ApiError;
+      setCancelError(
+        apiError.messages?.join(" ") ?? "Não foi possível cancelar o chamado"
+      );
+    } finally {
+      setCancelling(false);
+    }
+  }
+
+  async function handleAdvanceStatus() {
+    if (!nextAction) return;
+    setStatusError(null);
+    setUpdatingStatus(true);
+
+    try {
+      const updated = await updateServiceOrderStatus(order.id, {
+        status: nextAction.nextStatus,
+      });
+      onUpdated(updated);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setStatusError(
+        apiError.messages?.join(" ") ?? "Não foi possível atualizar o status"
+      );
+    } finally {
+      setUpdatingStatus(false);
+    }
+  }
 
   return (
     <div className="bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-3">
@@ -113,6 +255,69 @@ function OrderCard({
         </p>
       )}
 
+      {isCompleted && currentUserId && (
+        <div className="pt-1">
+          {myReview ? (
+            <div className="flex items-center gap-2 bg-[#F1F4F2] rounded-md px-3 py-2">
+              <StarRating value={myReview.rating} readOnly />
+              <span className="text-xs text-[#586268]">
+                Você avaliou {counterpartLabel.toLowerCase()}
+              </span>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowReviewModal(true)}
+              disabled={checkingReview}
+              className="w-full bg-transparent border border-[#C97F1E] text-[#C97F1E] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#FDF4E8] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {checkingReview ? "Verificando..." : `Avaliar ${counterpartLabel.toLowerCase()}`}
+            </button>
+          )}
+        </div>
+      )}
+
+      <Modal
+        open={showReviewModal}
+        onClose={() => {
+          setShowReviewModal(false);
+          setReviewError(null);
+        }}
+        title={`Avaliar ${counterpartName}`}
+      >
+        <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-2 py-2">
+            <StarRating value={rating} onChange={setRating} />
+            <p className="text-xs text-[#586268]">
+              {rating > 0 ? `${rating} de 5 estrelas` : "Toque para avaliar"}
+            </p>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-[#12233D]">
+              Comentário (opcional)
+            </label>
+            <textarea
+              value={comment}
+              onChange={(event) => setComment(event.target.value)}
+              rows={3}
+              maxLength={500}
+              className="mt-1.5 w-full border border-[#C7D1CB] rounded-md px-3 py-2 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+              placeholder="Conte como foi sua experiência..."
+            />
+          </div>
+
+          {reviewError && <p className="text-xs text-red-600">{reviewError}</p>}
+
+          <button
+            type="submit"
+            disabled={submittingReview}
+            className="w-full bg-[#12233D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {submittingReview ? "Enviando..." : "Enviar avaliação"}
+          </button>
+        </form>
+      </Modal>
+
       {showPayButton && !isCancelled && (
         <button
           onClick={() => navigate(buildPaymentPath(order.id))}
@@ -120,6 +325,66 @@ function OrderCard({
         >
           Pagar
         </button>
+      )}
+
+      {nextAction && (
+        <div className="flex flex-col gap-1.5">
+          <button
+            onClick={handleAdvanceStatus}
+            disabled={updatingStatus}
+            className="w-full bg-[#3F8F5F] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#2F6E48] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {updatingStatus ? "Atualizando..." : nextAction.label}
+          </button>
+          {statusError && <p className="text-xs text-red-600">{statusError}</p>}
+        </div>
+      )}
+
+      {canCancel && !confirmingCancel && (
+        <button
+          onClick={() => setConfirmingCancel(true)}
+          className="w-full bg-transparent border border-red-200 text-red-600 px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-red-50 transition-colors duration-150"
+        >
+          Cancelar chamado
+        </button>
+      )}
+
+      {canCancel && confirmingCancel && (
+        <form onSubmit={handleConfirmCancel} className="flex flex-col gap-2.5 pt-2 border-t border-[#F1F4F2]">
+          <label className="text-xs font-medium text-[#12233D]">
+            Motivo do cancelamento (opcional)
+          </label>
+          <textarea
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+            rows={2}
+            className="w-full border border-[#C7D1CB] rounded-md px-3 py-2 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+            placeholder="Ex: Imprevisto, remarquei para outra data..."
+          />
+
+          {cancelError && <p className="text-xs text-red-600">{cancelError}</p>}
+
+          <div className="flex gap-2">
+            <button
+              type="submit"
+              disabled={cancelling}
+              className="flex-1 bg-red-600 border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-red-700 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {cancelling ? "Cancelando..." : "Confirmar cancelamento"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmingCancel(false);
+                setReason("");
+                setCancelError(null);
+              }}
+              className="flex-1 bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150"
+            >
+              Voltar
+            </button>
+          </div>
+        </form>
       )}
     </div>
   );
@@ -170,6 +435,12 @@ export default function MyServiceOrdersPage() {
     };
   }, [user, page]);
 
+  function handleOrderUpdated(updated: ResponseServiceOrderJason) {
+    setOrders((current) =>
+      current.map((order) => (order.id === updated.id ? updated : order))
+    );
+  }
+
   const counterpartLabel = user?.role === "client" ? "Profissional" : "Cliente";
 
   return (
@@ -205,6 +476,9 @@ export default function MyServiceOrdersPage() {
                   user?.role === "client" ? order.workerName : order.clientName
                 }
                 showPayButton={user?.role === "client"}
+                isWorker={user?.role === "worker"}
+                currentUserId={user?.id}
+                onUpdated={handleOrderUpdated}
               />
             ))}
           </div>

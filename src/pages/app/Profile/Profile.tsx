@@ -17,6 +17,8 @@ import { maskPhone } from "@/utils/Masks";
 import { ResponseCategoryJason } from "@/types/category";
 import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 import EmailVerificationModal from "@/components/EmailVerificationModal/EmailVerificationModal";
+import ReviewsList from "@/components/ReviewsList/ReviewsList";
+
 
 interface ProfileState {
   name: string;
@@ -464,6 +466,8 @@ export default function ProfilePage() {
           </button>
         </form>
       </div>
+
+      {user?.role === "worker" && <ReviewsList workerId={user.id} />}
 
       {/* Zona de risco */}
       <div className="bg-white border border-red-200 rounded-xl p-6">
