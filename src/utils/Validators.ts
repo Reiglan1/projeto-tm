@@ -92,7 +92,7 @@ export function isValidRandomPixKey(value: string): boolean {
 export function isValidPixKey(type: string, value: string): boolean {
   if (!value.trim()) return false;
 
-  switch (type) {
+  switch (type.toUpperCase()) {
     case "CPF":
       return isValidCPF(value);
     case "CNPJ":

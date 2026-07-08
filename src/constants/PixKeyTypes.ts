@@ -1,13 +1,11 @@
-// ATENÇÃO: a API não documenta um enum pros valores de pixKeyType (o schema
-// aceita qualquer string). Os valores abaixo são uma suposição baseada em
-// convenção comum de mercado — confirme com o backend os valores exatos
-// aceitos antes de ir pra produção.
+// ATENÇÃO: confirmado com o backend (07/07) que o formato real é PascalCase
+// (Cpf, Cnpj, Email, Phone, Random) — não tudo maiúsculo como CPF/CNPJ.
 export const PIX_KEY_TYPES = {
-  CPF: "CPF",
-  CNPJ: "CNPJ",
-  EMAIL: "EMAIL",
-  PHONE: "PHONE",
-  RANDOM: "RANDOM",
+  CPF: "Cpf",
+  CNPJ: "Cnpj",
+  EMAIL: "Email",
+  PHONE: "Phone",
+  RANDOM: "Random",
 } as const;
 
 export type PixKeyType = (typeof PIX_KEY_TYPES)[keyof typeof PIX_KEY_TYPES];

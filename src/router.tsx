@@ -3,8 +3,9 @@ import {
   Outlet,
   RouterProvider,
   createBrowserRouter,
+  useNavigate,
 } from "react-router-dom";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 
 import { LayoutProvider, useLayout } from "@/context/LayoutProvider";
 import ErrorBoundary from "@/components/ErrorBoundary/ErrorBoundary";
@@ -17,6 +18,7 @@ const ResetPasswordPage = lazy(() => import("@/pages/auth/Home/sections/ResetPas
 const ProfilePage = lazy(() => import("@/pages/app/Profile/Profile"));
 const VerificationPage = lazy(() => import("@/pages/app/Verification/Verification"));
 const OpenServiceOrderPage = lazy(() => import("@/pages/app/OpenServiceOrder/OpenServiceOrder"));
+const WorkerProfilePage = lazy(() => import("@/pages/app/WorkerProfile/WorkerProfile"));
 const MyServiceOrdersPage = lazy(() => import("@/pages/app/MyServiceOrders/MyServiceOrders"));
 const PaymentPage = lazy(() => import("@/pages/app/Home/sections/Payment"));
 const CategoriesPage = lazy(() => import("@/pages/app/Home/sections/Categories"));
@@ -59,8 +61,31 @@ function AuthLoader() {
   return <Navigate to="/" replace={true} />;
 }
 
+// Escuta o evento disparado pelo interceptor do axios (services/api.ts)
+// quando qualquer request volta com 401. Como o axios não tem acesso ao
+// contexto do React, essa é a ponte: desloga e manda pro login com um aviso.
+function SessionWatcher() {
+  const { logout } = useLayout();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleSessionExpired() {
+      logout();
+      navigate(`${ROUTES.LOGIN}?sessionExpired=1`, { replace: true });
+    }
+
+    window.addEventListener("auth:session-expired", handleSessionExpired);
+    return () => {
+      window.removeEventListener("auth:session-expired", handleSessionExpired);
+    };
+  }, [logout, navigate]);
+
+  return null;
+}
+
 const AppLayout = () => (
   <LayoutProvider>
+    <SessionWatcher />
     <Suspense fallback={<LoadingComponent />}>
       <Outlet />
     </Suspense>
@@ -104,6 +129,11 @@ const RouterConfig = createBrowserRouter([
               {
                 path: ROUTES.OPEN_SERVICE_ORDER,
                 Component: OpenServiceOrderPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.WORKER_PROFILE,
+                Component: WorkerProfilePage,
                 errorElement: <ErrorElement />,
               },
               {

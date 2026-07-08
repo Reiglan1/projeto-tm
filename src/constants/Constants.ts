@@ -9,6 +9,8 @@ export const ROUTES = {
 
     OPEN_SERVICE_ORDER: "/abrir-chamado/:workerId",
 
+    WORKER_PROFILE: "/profissionais/:workerId",
+
     MY_SERVICE_ORDERS: "/meus-chamados",
 
     PROFESSIONAL_WALLET: "/carteira-profissional",
@@ -31,6 +33,10 @@ export const ROUTES = {
 // Monta o caminho de "abrir chamado" já com o id do profissional escolhido
 export function buildOpenServiceOrderPath(workerId: string): string {
     return `/abrir-chamado/${workerId}`;
+}
+
+export function buildWorkerProfilePath(workerId: string): string {
+    return `/profissionais/${workerId}`;
 }
 
 export function buildPaymentPath(serviceOrderId: string): string {

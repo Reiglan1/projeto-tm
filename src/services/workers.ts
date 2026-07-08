@@ -1,6 +1,6 @@
 import api from "./api";
 import { normalizeError } from "./apiError";
-import { ResponseAllWorkersJason } from "@/types/worker";
+import { ResponseAllWorkersJason, ResponseWorkerDetailJason } from "@/types/worker";
 
 export interface GetWorkersParams {
   page?: number;
@@ -21,6 +21,15 @@ export async function getWorkers(
         sortBy: params.sortBy || undefined,
       },
     });
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+export async function getWorkerById(id: string): Promise<ResponseWorkerDetailJason> {
+  try {
+    const { data } = await api.get<ResponseWorkerDetailJason>(`/api/workers/${id}`);
     return data;
   } catch (error) {
     throw normalizeError(error);

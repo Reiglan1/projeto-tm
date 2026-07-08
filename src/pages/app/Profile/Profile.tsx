@@ -20,7 +20,6 @@ import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 import EmailVerificationModal from "@/components/EmailVerificationModal/EmailVerificationModal";
 import ReviewsList from "@/components/ReviewsList/ReviewsList";
 
-
 interface ProfileState {
   name: string;
   email: string;
@@ -58,7 +57,7 @@ function formatDate(value: string): string {
 }
 
 function formatPixKeyValue(type: string, value: string): string {
-  switch (type) {
+  switch (type.toUpperCase()) {
     case "CPF":
       return maskCPF(value);
     case "CNPJ":
@@ -71,7 +70,7 @@ function formatPixKeyValue(type: string, value: string): string {
 }
 
 function normalizePixKeyValue(type: string, value: string): string {
-  switch (type) {
+  switch (type.toUpperCase()) {
     case "CPF":
     case "CNPJ":
     case "PHONE":
@@ -81,6 +80,19 @@ function normalizePixKeyValue(type: string, value: string): string {
     default:
       return value.trim();
   }
+}
+
+function pixKeyTypeLabel(type: string): string {
+  return PIX_KEY_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
+}
+
+// A API pode não devolver o valor real da chave por segurança (só o tipo),
+// então mostramos os últimos 4 caracteres quando disponível, ou um texto
+// genérico quando só sabemos que existe uma chave cadastrada.
+function maskPixKeyDisplay(key: string | null | undefined): string {
+  if (!key) return "Chave cadastrada";
+  const visible = key.slice(-4);
+  return `•••• ${visible}`;
 }
 
 export default function ProfilePage() {
@@ -98,6 +110,7 @@ export default function ProfilePage() {
   const [available24Hours, setAvailable24Hours] = useState(false);
   const [pixKeyType, setPixKeyType] = useState("");
   const [pixKeyValue, setPixKeyValue] = useState("");
+  const [editingPixKey, setEditingPixKey] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -162,12 +175,6 @@ export default function ProfilePage() {
         setDescription(data.description ?? "");
         setCategoryIds(data.categoryIds ?? []);
         setAvailable24Hours(Boolean(data.available24Hours));
-        setPixKeyType(data.pixKeyType ?? "");
-        setPixKeyValue(
-          data.pixKeyType && data.pixKey
-            ? formatPixKeyValue(data.pixKeyType, data.pixKey)
-            : ""
-        );
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -226,9 +233,9 @@ export default function ProfilePage() {
       errors.categoryIds = "Escolha ao menos uma categoria de serviço";
     }
 
-    // Chave Pix é opcional, mas se um dos dois campos foi preenchido, os dois
-    // precisam estar presentes e a chave precisa ser válida pro tipo escolhido.
-    if (pixKeyType || pixKeyValue.trim()) {
+    // Chave Pix só é validada quando o usuário está de fato adicionando ou
+    // trocando uma chave. Remoção e visualização não passam por aqui.
+    if (editingPixKey) {
       if (!pixKeyType) {
         errors.pixKey = "Escolha o tipo da chave";
       } else if (!isValidPixKey(pixKeyType, pixKeyValue)) {
@@ -250,7 +257,7 @@ export default function ProfilePage() {
 
     setSaving(true);
 
-    const hasPixKey = Boolean(pixKeyType && pixKeyValue.trim());
+    const hasPixKey = Boolean(editingPixKey && pixKeyType && pixKeyValue.trim());
     const normalizedPixKey = hasPixKey
       ? normalizePixKeyValue(pixKeyType, pixKeyValue)
       : undefined;
@@ -302,6 +309,9 @@ export default function ProfilePage() {
       }
 
       setUser({ ...user, name });
+      setEditingPixKey(false);
+      setPixKeyType("");
+      setPixKeyValue("");
       setSaveSuccess(true);
     } catch (error) {
       const apiError = error as ApiError;
@@ -483,45 +493,100 @@ export default function ProfilePage() {
 
           <div>
             <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-              Chave Pix <span className="text-[#586268] font-normal">(opcional)</span>
+              Chave Pix <span className="text-[#586268] font-normal">(obrigatório)</span>
             </label>
-            <div className="flex gap-2">
-              <select
-                value={pixKeyType}
-                onChange={(event) => {
-                  setPixKeyType(event.target.value);
-                  setPixKeyValue("");
-                  setFieldErrors((current) => ({ ...current, pixKey: undefined }));
-                }}
-                className="w-36 shrink-0 border border-[#C7D1CB] rounded-md px-3 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] bg-white"
-              >
-                <option value="">Tipo</option>
-                {PIX_KEY_TYPE_OPTIONS.map((option: any) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                value={pixKeyValue}
-                disabled={!pixKeyType}
-                onChange={(event) => {
-                  setPixKeyValue(formatPixKeyValue(pixKeyType, event.target.value));
-                  setFieldErrors((current) => ({ ...current, pixKey: undefined }));
-                }}
-                placeholder={
-                  pixKeyType ? "Digite sua chave Pix" : "Escolha o tipo primeiro"
-                }
-                className={`flex-1 min-w-0 border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] disabled:bg-[#F1F4F2] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#C7D1CB]"
-                  }`}
-              />
-            </div>
-            {fieldErrors.pixKey ? (
-              <p className="text-xs text-red-600 mt-1">{fieldErrors.pixKey}</p>
+
+            {editingPixKey ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <select
+                    value={pixKeyType}
+                    onChange={(event) => {
+                      setPixKeyType(event.target.value);
+                      setPixKeyValue("");
+                      setFieldErrors((current) => ({ ...current, pixKey: undefined }));
+                    }}
+                    className="w-36 shrink-0 border border-[#C7D1CB] rounded-md px-3 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] bg-white"
+                  >
+                    <option value="">Tipo</option>
+                    {PIX_KEY_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={pixKeyValue}
+                    disabled={!pixKeyType}
+                    onChange={(event) => {
+                      setPixKeyValue(formatPixKeyValue(pixKeyType, event.target.value));
+                      setFieldErrors((current) => ({ ...current, pixKey: undefined }));
+                    }}
+                    placeholder={
+                      pixKeyType ? "Digite sua chave Pix" : "Escolha o tipo primeiro"
+                    }
+                    className={`flex-1 min-w-0 border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] disabled:bg-[#F1F4F2] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#C7D1CB]"
+                      }`}
+                  />
+                </div>
+                {fieldErrors.pixKey && (
+                  <p className="text-xs text-red-600">{fieldErrors.pixKey}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingPixKey(false);
+                    setPixKeyType("");
+                    setPixKeyValue("");
+                    setFieldErrors((current) => ({ ...current, pixKey: undefined }));
+                  }}
+                  className="text-xs text-[#586268] font-medium underline bg-transparent border-none cursor-pointer self-start"
+                >
+                  Cancelar
+                </button>
+              </div>
+            ) : profile.pixKeyType ? (
+              <div className="flex items-center justify-between gap-3 border border-[#C7D1CB] rounded-md px-3.5 py-2.5">
+                <div>
+                  <p className="text-sm font-medium text-[#12233D]">
+                    {pixKeyTypeLabel(profile.pixKeyType)}
+                  </p>
+                  <p className="text-xs text-[#586268]">
+                    {maskPixKeyDisplay(profile.pixKey)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingPixKey(true);
+                    setPixKeyType(profile.pixKeyType ?? "");
+                    setPixKeyValue("");
+                  }}
+                  className="text-xs text-[#3E6990] font-medium underline bg-transparent border-none cursor-pointer shrink-0"
+                >
+                  Trocar
+                </button>
+              </div>
             ) : (
-              <p className="text-xs text-[#586268] mt-1">
-                Usada para receber seus repasses/saques via Pix.
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingPixKey(true);
+                  setPixKeyType("");
+                  setPixKeyValue("");
+                }}
+                className="text-sm text-[#3E6990] font-medium underline bg-transparent border-none cursor-pointer"
+              >
+                + Adicionar chave Pix
+              </button>
+            )}
+
+            {!editingPixKey && (
+              <p className="text-xs text-[#586268] mt-1.5">
+                {profile.pixKeyType
+                  ? "Usada para receber seus repasses/saques via Pix. Não é possível remover, só trocar por outra."
+                  : "Usada para receber seus repasses/saques via Pix."}
               </p>
             )}
           </div>

@@ -5,7 +5,7 @@ import { ResponseWorkerDetailJason } from "@/types/worker";
 import { ApiError } from "@/services/apiError";
 import { maskPhone } from "@/utils/Masks";
 import { useLayout } from "@/context/LayoutProvider";
-import { buildOpenServiceOrderPath } from "@/constants/Constants";
+import { buildOpenServiceOrderPath, buildWorkerProfilePath } from "@/constants/Constants";
 import WorkersSearchBar from "@/pages/app/Home/sections/WorkersSearchBar";
 
 const PAGE_SIZE = 9;
@@ -67,8 +67,13 @@ function WorkerCard({
   const hasReviews = worker.reviewCount > 0;
   const hasDescription = Boolean(worker.description?.trim());
 
-  return (
-    <div className="group bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5">
+ return (
+    <div
+      onClick={() => navigate(buildWorkerProfilePath(worker.id))}
+      role="button"
+      tabIndex={0}
+      className="group bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 cursor-pointer transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
+    >
       <div className="flex items-start gap-3.5">
         <div className="relative shrink-0">
           {worker.profilePhotoUrl ? (
@@ -164,7 +169,10 @@ function WorkerCard({
 
       {showRequestButton && (
         <button
-          onClick={() => navigate(buildOpenServiceOrderPath(worker.id))}
+          onClick={(event) => {
+            event.stopPropagation();
+            navigate(buildOpenServiceOrderPath(worker.id));
+          }}
           className="w-full bg-[#12233D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150"
         >
           Solicitar serviço
