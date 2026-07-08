@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useLayout } from "@/context/LayoutProvider";
 import { ROUTES } from "@/constants/Constants";
 import { getWalletBalance } from "@/services/wallet";
+import { getClientWallet } from "@/services/clientWallet";
 import { BALANCE_KEYS, formatCurrency, pickBalanceNumber } from "@/utils/Wallet";
 
 function getInitials(name?: string): string {
@@ -48,9 +49,17 @@ export default function HeaderAuth() {
     let cancelled = false;
     setWalletLoading(true);
 
-    getWalletBalance()
-      .then((data) => {
-        if (!cancelled) setWalletBalance(pickBalanceNumber(data, BALANCE_KEYS));
+    // Cliente e worker usam carteiras diferentes: a do cliente (saldo
+    // pré-pago) tem schema tipado; a do worker (repasses) ainda não, daí o
+    // pickBalanceNumber "adivinhando" o campo.
+    const request =
+      user.role === "client"
+        ? getClientWallet().then((data) => data.balance)
+        : getWalletBalance().then((data) => pickBalanceNumber(data, BALANCE_KEYS));
+
+    request
+      .then((value) => {
+        if (!cancelled) setWalletBalance(value);
       })
       .catch(() => {
         if (!cancelled) setWalletBalance(null);
@@ -97,7 +106,7 @@ export default function HeaderAuth() {
   function handleWallet() {
     setProfileOpen(false);
     setMenuOpen(false);
-    navigate(ROUTES.WALLET);
+    navigate(user?.role === "client" ? ROUTES.CLIENT_WALLET : ROUTES.PROFESSIONAL_WALLET);
   }
 
   function handleGoHome() {
@@ -153,57 +162,57 @@ export default function HeaderAuth() {
         )}
 
         <div className="relative" ref={profileRef}>
-        <button
-          onClick={() => setProfileOpen((current) => !current)}
-          className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer py-1 pl-1 pr-2 rounded-full hover:bg-[#F1F4F2] transition-colors duration-150"
-        >
-          <span className="w-9 h-9 rounded-full bg-[#12233D] text-white flex items-center justify-center text-sm font-semibold shrink-0">
-            {getInitials(user?.name)}
-          </span>
-          <span className="text-[13px] font-medium text-[#12233D] max-w-[120px] truncate">
-            {user?.name ?? "Minha conta"}
-          </span>
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            className={`text-[#586268] transition-transform duration-150 ${profileOpen ? "rotate-180" : ""}`}
+          <button
+            onClick={() => setProfileOpen((current) => !current)}
+            className="flex items-center gap-2.5 bg-transparent border-none cursor-pointer py-1 pl-1 pr-2 rounded-full hover:bg-[#F1F4F2] transition-colors duration-150"
           >
-            <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+            <span className="w-9 h-9 rounded-full bg-[#12233D] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+              {getInitials(user?.name)}
+            </span>
+            <span className="text-[13px] font-medium text-[#12233D] max-w-[120px] truncate">
+              {user?.name ?? "Minha conta"}
+            </span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className={`text-[#586268] transition-transform duration-150 ${profileOpen ? "rotate-180" : ""}`}
+            >
+              <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
 
-        {profileOpen && (
-          <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#C7D1CB] rounded-lg shadow-lg py-2 z-50">
-            <div className="px-4 py-2.5 border-b border-[#C7D1CB]">
-              <p className="text-sm font-semibold text-[#12233D] truncate">
-                {user?.name ?? "Usuário"}
-              </p>
-              <p className="text-xs text-[#586268] truncate">{user?.email}</p>
+          {profileOpen && (
+            <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-[#C7D1CB] rounded-lg shadow-lg py-2 z-50">
+              <div className="px-4 py-2.5 border-b border-[#C7D1CB]">
+                <p className="text-sm font-semibold text-[#12233D] truncate">
+                  {user?.name ?? "Usuário"}
+                </p>
+                <p className="text-xs text-[#586268] truncate">{user?.email}</p>
+              </div>
+              <button
+                onClick={handleProfile}
+                className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
+              >
+                Meu perfil
+              </button>
+              <button
+                onClick={handleMyOrders}
+                className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
+              >
+                Meus chamados
+              </button>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2.5 text-sm text-red-600 bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
+              >
+                Sair
+              </button>
             </div>
-            <button
-              onClick={handleProfile}
-              className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
-            >
-              Meu perfil
-            </button>
-            <button
-              onClick={handleMyOrders}
-              className="w-full text-left px-4 py-2.5 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
-            >
-              Meus chamados
-            </button>
-            <button
-              onClick={handleLogout}
-              className="w-full text-left px-4 py-2.5 text-sm text-red-600 bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2] transition-colors duration-150"
-            >
-              Sair
-            </button>
-          </div>
-        )}
+          )}
         </div>
       </div>
 

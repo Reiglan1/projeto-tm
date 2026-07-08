@@ -12,9 +12,10 @@ import {
 } from "@/services/profile";
 import { getCategories } from "@/services/categories";
 import { ApiError } from "@/services/apiError";
-import { isValidPhone, onlyDigits } from "@/utils/Validators";
-import { maskPhone } from "@/utils/Masks";
+import { isValidPhone, isValidPixKey, onlyDigits } from "@/utils/Validators";
+import { maskCNPJ, maskCPF, maskPhone } from "@/utils/Masks";
 import { ResponseCategoryJason } from "@/types/category";
+import { PIX_KEY_TYPE_OPTIONS } from "@/constants/PixKeyTypes";
 import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 import EmailVerificationModal from "@/components/EmailVerificationModal/EmailVerificationModal";
 import ReviewsList from "@/components/ReviewsList/ReviewsList";
@@ -33,12 +34,15 @@ interface ProfileState {
   categoryIds?: string[];
   averageRating?: number;
   reviewCount?: number;
+  pixKey?: string | null;
+  pixKeyType?: string | null;
 }
 
 interface FieldErrors {
   name?: string;
   phone?: string;
   categoryIds?: string;
+  pixKey?: string;
 }
 
 function formatDate(value: string): string {
@@ -50,6 +54,32 @@ function formatDate(value: string): string {
     });
   } catch {
     return value;
+  }
+}
+
+function formatPixKeyValue(type: string, value: string): string {
+  switch (type) {
+    case "CPF":
+      return maskCPF(value);
+    case "CNPJ":
+      return maskCNPJ(value);
+    case "PHONE":
+      return maskPhone(value);
+    default:
+      return value;
+  }
+}
+
+function normalizePixKeyValue(type: string, value: string): string {
+  switch (type) {
+    case "CPF":
+    case "CNPJ":
+    case "PHONE":
+      return onlyDigits(value);
+    case "EMAIL":
+      return value.trim().toLowerCase();
+    default:
+      return value.trim();
   }
 }
 
@@ -66,6 +96,8 @@ export default function ProfilePage() {
   const [description, setDescription] = useState("");
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [available24Hours, setAvailable24Hours] = useState(false);
+  const [pixKeyType, setPixKeyType] = useState("");
+  const [pixKeyValue, setPixKeyValue] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -98,6 +130,8 @@ export default function ProfilePage() {
             status: data.status,
             emailVerified: data.emailVerified,
             createdAt: data.createdAt,
+            pixKey: data.pixKey,
+            pixKeyType: data.pixKeyType,
           })
         )
         : getWorkerProfile(user.id).then(
@@ -114,6 +148,8 @@ export default function ProfilePage() {
             categoryIds: (data.professions ?? []).map((p) => p.categoryId),
             averageRating: data.averageRating,
             reviewCount: data.reviewCount,
+            pixKey: data.pixKey,
+            pixKeyType: data.pixKeyType,
           })
         );
 
@@ -126,6 +162,12 @@ export default function ProfilePage() {
         setDescription(data.description ?? "");
         setCategoryIds(data.categoryIds ?? []);
         setAvailable24Hours(Boolean(data.available24Hours));
+        setPixKeyType(data.pixKeyType ?? "");
+        setPixKeyValue(
+          data.pixKeyType && data.pixKey
+            ? formatPixKeyValue(data.pixKeyType, data.pixKey)
+            : ""
+        );
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -183,6 +225,17 @@ export default function ProfilePage() {
     if (user?.role === "worker" && categoryIds.length === 0) {
       errors.categoryIds = "Escolha ao menos uma categoria de serviço";
     }
+
+    // Chave Pix é opcional, mas se um dos dois campos foi preenchido, os dois
+    // precisam estar presentes e a chave precisa ser válida pro tipo escolhido.
+    if (pixKeyType || pixKeyValue.trim()) {
+      if (!pixKeyType) {
+        errors.pixKey = "Escolha o tipo da chave";
+      } else if (!isValidPixKey(pixKeyType, pixKeyValue)) {
+        errors.pixKey = "Chave Pix inválida para o tipo escolhido";
+      }
+    }
+
     return errors;
   }
 
@@ -197,14 +250,30 @@ export default function ProfilePage() {
 
     setSaving(true);
 
+    const hasPixKey = Boolean(pixKeyType && pixKeyValue.trim());
+    const normalizedPixKey = hasPixKey
+      ? normalizePixKeyValue(pixKeyType, pixKeyValue)
+      : undefined;
+    const normalizedPixKeyType = hasPixKey ? pixKeyType : undefined;
+
     try {
       if (user.role === "client") {
         const updated = await updateClientProfile(user.id, {
           name,
           phone: onlyDigits(phone),
+          pixKey: normalizedPixKey,
+          pixKeyType: normalizedPixKeyType,
         });
         setProfile((current) =>
-          current ? { ...current, name: updated.name, phone: updated.phone } : current
+          current
+            ? {
+              ...current,
+              name: updated.name,
+              phone: updated.phone,
+              pixKey: updated.pixKey,
+              pixKeyType: updated.pixKeyType,
+            }
+            : current
         );
       } else {
         const updated = await updateWorkerProfile(user.id, {
@@ -213,6 +282,8 @@ export default function ProfilePage() {
           categoryIds,
           description: description || undefined,
           available24Hours,
+          pixKey: normalizedPixKey,
+          pixKeyType: normalizedPixKeyType,
         });
         setProfile((current) =>
           current
@@ -223,6 +294,8 @@ export default function ProfilePage() {
               description: updated.description,
               categoryIds: (updated.professions ?? []).map((p) => p.categoryId),
               available24Hours: updated.available24Hours,
+              pixKey: updated.pixKey,
+              pixKeyType: updated.pixKeyType,
             }
             : current
         );
@@ -405,6 +478,51 @@ export default function ProfilePage() {
             />
             {fieldErrors.phone && (
               <p className="text-xs text-red-600 mt-1">{fieldErrors.phone}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              Chave Pix <span className="text-[#586268] font-normal">(opcional)</span>
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={pixKeyType}
+                onChange={(event) => {
+                  setPixKeyType(event.target.value);
+                  setPixKeyValue("");
+                  setFieldErrors((current) => ({ ...current, pixKey: undefined }));
+                }}
+                className="w-36 shrink-0 border border-[#C7D1CB] rounded-md px-3 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] bg-white"
+              >
+                <option value="">Tipo</option>
+                {PIX_KEY_TYPE_OPTIONS.map((option: any) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                value={pixKeyValue}
+                disabled={!pixKeyType}
+                onChange={(event) => {
+                  setPixKeyValue(formatPixKeyValue(pixKeyType, event.target.value));
+                  setFieldErrors((current) => ({ ...current, pixKey: undefined }));
+                }}
+                placeholder={
+                  pixKeyType ? "Digite sua chave Pix" : "Escolha o tipo primeiro"
+                }
+                className={`flex-1 min-w-0 border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] disabled:bg-[#F1F4F2] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#C7D1CB]"
+                  }`}
+              />
+            </div>
+            {fieldErrors.pixKey ? (
+              <p className="text-xs text-red-600 mt-1">{fieldErrors.pixKey}</p>
+            ) : (
+              <p className="text-xs text-[#586268] mt-1">
+                Usada para receber seus repasses/saques via Pix.
+              </p>
             )}
           </div>
 

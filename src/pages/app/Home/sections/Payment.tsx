@@ -44,6 +44,7 @@ export default function PaymentPage() {
   const [payment, setPayment] = useState<PaymentRecord | null>(null);
 
   const [email, setEmail] = useState(user?.email ?? "");
+  const [paymentMethod, setPaymentMethod] = useState<"pix" | "wallet">("pix");
   const [initiating, setInitiating] = useState(false);
   const [initiateError, setInitiateError] = useState<string | null>(null);
 
@@ -136,7 +137,7 @@ export default function PaymentPage() {
     setInitiateError(null);
 
     if (!serviceOrderId) return;
-    if (!email.trim()) {
+    if (paymentMethod === "pix" && !email.trim()) {
       setInitiateError("Informe o e-mail para receber a confirmação");
       return;
     }
@@ -144,12 +145,16 @@ export default function PaymentPage() {
     setInitiating(true);
 
     try {
-      const result = await initiatePayment({
-        serviceOrderId,
-        method: "pix",
-        payerEmail: email,
-        installments: 1,
-      });
+      const result = await initiatePayment(
+        paymentMethod === "wallet"
+          ? { serviceOrderId, method: "wallet" }
+          : {
+            serviceOrderId,
+            method: "pix",
+            payerEmail: email,
+            installments: 1,
+          }
+      );
       setPayment(result);
     } catch (error) {
       const apiError = error as ApiError;
@@ -232,21 +237,53 @@ export default function PaymentPage() {
           className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex flex-col gap-4"
         >
           <h2 className="text-sm font-semibold text-[#12233D]">
-            Pagar com PIX
+            Como você quer pagar?
           </h2>
 
-          <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-              E-mail para confirmação
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
-              placeholder="voce@email.com"
-            />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setPaymentMethod("pix")}
+              className={`flex-1 border rounded-md px-4 py-2.5 text-[13px] font-semibold cursor-pointer transition-colors duration-150 ${paymentMethod === "pix"
+                ? "bg-[#12233D] border-[#12233D] text-white"
+                : "bg-transparent border-[#C7D1CB] text-[#12233D] hover:border-[#12233D]"
+                }`}
+            >
+              Pix
+            </button>
+            <button
+              type="button"
+              onClick={() => setPaymentMethod("wallet")}
+              className={`flex-1 border rounded-md px-4 py-2.5 text-[13px] font-semibold cursor-pointer transition-colors duration-150 ${paymentMethod === "wallet"
+                ? "bg-[#12233D] border-[#12233D] text-white"
+                : "bg-transparent border-[#C7D1CB] text-[#12233D] hover:border-[#12233D]"
+                }`}
+            >
+              Saldo da carteira
+            </button>
           </div>
+
+          {paymentMethod === "pix" && (
+            <div>
+              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+                E-mail para confirmação
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+                placeholder="voce@email.com"
+              />
+            </div>
+          )}
+
+          {paymentMethod === "wallet" && (
+            <p className="text-sm text-[#586268]">
+              O valor será debitado do saldo da sua carteira. Se o saldo for
+              insuficiente, o pagamento será recusado.
+            </p>
+          )}
 
           {initiateError && (
             <p className="text-sm text-red-600">{initiateError}</p>
@@ -257,7 +294,11 @@ export default function PaymentPage() {
             disabled={initiating}
             className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {initiating ? "Gerando PIX..." : `Pagar ${formatCurrency(order.value)} com PIX`}
+            {initiating
+              ? "Processando..."
+              : paymentMethod === "wallet"
+                ? `Pagar ${formatCurrency(order.value)} com saldo`
+                : `Pagar ${formatCurrency(order.value)} com PIX`}
           </button>
         </form>
       )}
@@ -318,17 +359,31 @@ export default function PaymentPage() {
             </a>
           )}
 
-          {!payment.qrCodeBase64 && !payment.qrCode && !payment.ticketUrl && !payment.paymentUrl && (
-            <div>
-              <p className="text-sm text-[#586268] mb-2">
-                Não consegui identificar QR code ou link de pagamento na
-                resposta da API. Confira o JSON abaixo com o time de backend.
-              </p>
-              <pre className="text-xs text-[#586268] bg-[#F1F4F2] rounded-md p-3 overflow-x-auto">
-                {JSON.stringify(payment, null, 2)}
-              </pre>
-            </div>
-          )}
+          {!payment.qrCodeBase64 && !payment.qrCode && !payment.ticketUrl && !payment.paymentUrl && (() => {
+            const raw = (payment.status ?? "").toString().toUpperCase();
+            const isApproved =
+              raw.includes("APPROV") || raw.includes("PAID") || raw.includes("SUCCESS") || raw.includes("ESCROW");
+
+            if (isApproved) {
+              return (
+                <p className="text-sm text-[#2F6E48] bg-[#3F8F5F]/10 rounded-md px-3 py-2.5">
+                  Pagamento confirmado com o saldo da sua carteira.
+                </p>
+              );
+            }
+
+            return (
+              <div>
+                <p className="text-sm text-[#586268] mb-2">
+                  Não consegui identificar QR code ou link de pagamento na
+                  resposta da API. Confira o JSON abaixo com o time de backend.
+                </p>
+                <pre className="text-xs text-[#586268] bg-[#F1F4F2] rounded-md p-3 overflow-x-auto">
+                  {JSON.stringify(payment, null, 2)}
+                </pre>
+              </div>
+            );
+          })()}
 
           {refreshError && <p className="text-sm text-red-600">{refreshError}</p>}
 

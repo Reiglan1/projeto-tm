@@ -16,6 +16,8 @@ export interface ResponseWorkerDetailJason {
   available24Hours: boolean;
   profilePhotoUrl: string | null;
   description: string | null;
+  pixKey: string | null;
+  pixKeyType: string | null;
   professions: ResponseWorkerProfessionJason[];
   averageRating: number;
   reviewCount: number;
@@ -36,4 +38,6 @@ export interface RequestUpdateWorkerJason {
   categoryIds: string[];
   description?: string;
   available24Hours: boolean;
+  pixKey?: string;
+  pixKeyType?: string;
 }

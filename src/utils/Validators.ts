@@ -57,3 +57,53 @@ export function checkPasswordRules(password: string): PasswordRuleResult[] {
 export function isValidPassword(password: string): boolean {
   return checkPasswordRules(password).every((rule) => rule.valid);
 }
+
+export function isValidCNPJ(value: string): boolean {
+  const cnpj = onlyDigits(value);
+
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1{13}$/.test(cnpj)) return false;
+
+  const digits = cnpj.split("").map(Number);
+
+  function calcCheckDigit(base: number[]): number {
+    const weights =
+      base.length === 12
+        ? [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]
+        : [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+    const sum = base.reduce((acc, digit, index) => acc + digit * weights[index], 0);
+    const remainder = sum % 11;
+    return remainder < 2 ? 0 : 11 - remainder;
+  }
+
+  const firstCheck = calcCheckDigit(digits.slice(0, 12));
+  const secondCheck = calcCheckDigit(digits.slice(0, 13));
+
+  return firstCheck === digits[12] && secondCheck === digits[13];
+}
+
+// Chave aleatória (EVP) do Pix: 32 caracteres hexadecimais, geralmente
+// exibida no formato UUID (8-4-4-4-12).
+export function isValidRandomPixKey(value: string): boolean {
+  const cleaned = value.replace(/-/g, "");
+  return /^[a-fA-F0-9]{32}$/.test(cleaned);
+}
+
+export function isValidPixKey(type: string, value: string): boolean {
+  if (!value.trim()) return false;
+
+  switch (type) {
+    case "CPF":
+      return isValidCPF(value);
+    case "CNPJ":
+      return isValidCNPJ(value);
+    case "EMAIL":
+      return isValidEmail(value);
+    case "PHONE":
+      return isValidPhone(value);
+    case "RANDOM":
+      return isValidRandomPixKey(value);
+    default:
+      return false;
+  }
+}

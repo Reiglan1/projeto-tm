@@ -7,10 +7,14 @@ export interface ResponseClientDetailJason {
   phone: string;
   status: string;
   emailVerified: boolean;
+  pixKey: string | null;
+  pixKeyType: string | null;
   createdAt: string;
 }
 
 export interface RequestUpdateClientJason {
   name: string;
   phone: string;
+  pixKey?: string;
+  pixKeyType?: string;
 }

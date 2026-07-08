@@ -11,7 +11,9 @@ export const ROUTES = {
 
     MY_SERVICE_ORDERS: "/meus-chamados",
 
-    WALLET: "/carteira",
+    PROFESSIONAL_WALLET: "/carteira-profissional",
+
+    CLIENT_WALLET: "/carteira-cliente",
 
     CATEGORIES: "/servicos",
 

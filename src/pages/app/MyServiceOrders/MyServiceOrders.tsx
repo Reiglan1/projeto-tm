@@ -354,6 +354,10 @@ function OrderCard({
           <label className="text-xs font-medium text-[#12233D]">
             Motivo do cancelamento (opcional)
           </label>
+          <p className="text-xs text-[#586268]">
+            Se o chamado já estiver pago, o valor é estornado automaticamente
+            após o cancelamento.
+          </p>
           <textarea
             value={reason}
             onChange={(event) => setReason(event.target.value)}

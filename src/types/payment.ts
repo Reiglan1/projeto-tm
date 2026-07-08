@@ -13,7 +13,7 @@ export interface PaymentRecord {
 export interface RequestInitiatePaymentJason {
   serviceOrderId: string;
   method: string;
-  payerEmail: string;
+  payerEmail?: string;
   cardToken?: string;
   paymentMethodId?: string;
   installments?: number;

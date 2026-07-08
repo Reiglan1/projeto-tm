@@ -20,7 +20,8 @@ const OpenServiceOrderPage = lazy(() => import("@/pages/app/OpenServiceOrder/Ope
 const MyServiceOrdersPage = lazy(() => import("@/pages/app/MyServiceOrders/MyServiceOrders"));
 const PaymentPage = lazy(() => import("@/pages/app/Home/sections/Payment"));
 const CategoriesPage = lazy(() => import("@/pages/app/Home/sections/Categories"));
-const WalletPage = lazy(() => import("@/pages/app/Wallet/Wallet"));
+const ProfessionalWalletPage = lazy(() => import("@/pages/app/Wallet/Wallet"));
+const ClientWalletPage = lazy(() => import("@/pages/app/ClientWallet/ClientWallet"));
 const HomePage = lazy(() => import("@/pages/app/Home/Home"));
 const LayoutAuth = lazy(() => import("@/pages/auth/LayoutAuth/LayoutAuth"));
 const LayoutApp = lazy(() => import("@/pages/app/LayoutApp/LayoutApp"));
@@ -110,9 +111,14 @@ const RouterConfig = createBrowserRouter([
                 Component: MyServiceOrdersPage,
                 errorElement: <ErrorElement />,
               },
-               {
-                path: ROUTES.WALLET,
-                Component: WalletPage,
+              {
+                path: ROUTES.PROFESSIONAL_WALLET,
+                Component: ProfessionalWalletPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.CLIENT_WALLET,
+                Component: ClientWalletPage,
                 errorElement: <ErrorElement />,
               },
               {
