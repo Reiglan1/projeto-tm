@@ -11,6 +11,8 @@ export const ROUTES = {
 
     WORKER_PROFILE: "/profissionais/:workerId",
 
+    CLIENT_PROFILE: "/clientes/:clientId",
+
     MY_SERVICE_ORDERS: "/meus-chamados",
 
     PROFESSIONAL_WALLET: "/carteira-profissional",
@@ -37,6 +39,10 @@ export function buildOpenServiceOrderPath(workerId: string): string {
 
 export function buildWorkerProfilePath(workerId: string): string {
     return `/profissionais/${workerId}`;
+}
+
+export function buildClientProfilePath(clientId: string): string {
+    return `/clientes/${clientId}`;
 }
 
 export function buildPaymentPath(serviceOrderId: string): string {

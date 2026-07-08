@@ -67,61 +67,60 @@ function WorkerCard({
   const hasReviews = worker.reviewCount > 0;
   const hasDescription = Boolean(worker.description?.trim());
 
- return (
+  return (
     <div
       onClick={() => navigate(buildWorkerProfilePath(worker.id))}
       role="button"
       tabIndex={0}
-      className="group bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 cursor-pointer transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
+      className="group bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 h-full cursor-pointer transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
     >
-      <div className="flex items-start gap-3.5">
-        <div className="relative shrink-0">
-          {worker.profilePhotoUrl ? (
-            <img
-              src={worker.profilePhotoUrl}
-              alt={worker.name}
-              className={`w-14 h-14 rounded-full object-cover ring-2 ring-offset-2 ${
-                verification.verified ? "ring-[#3F8F5F]" : "ring-[#C7D1CB]"
-              }`}
-            />
-          ) : (
-            <span
-              className={`w-14 h-14 rounded-full bg-[#12233D] text-white flex items-center justify-center text-base font-semibold ring-2 ring-offset-2 ${
-                verification.verified ? "ring-[#3F8F5F]" : "ring-[#C7D1CB]"
-              }`}
-            >
-              {getInitials(worker.name)}
-            </span>
-          )}
-          {verification.verified && (
-            <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#3F8F5F] border-2 border-white flex items-center justify-center">
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6L9 17l-5-5" />
-              </svg>
-            </span>
-          )}
-        </div>
+      <div className="flex flex-col gap-4 flex-1">
+        <div className="flex items-start gap-3.5">
+          <div className="relative shrink-0">
+            {worker.profilePhotoUrl ? (
+              <img
+                src={worker.profilePhotoUrl}
+                alt={worker.name}
+                className={`w-14 h-14 rounded-full object-cover ring-2 ring-offset-2 ${verification.verified ? "ring-[#3F8F5F]" : "ring-[#C7D1CB]"
+                  }`}
+              />
+            ) : (
+              <span
+                className={`w-14 h-14 rounded-full bg-[#12233D] text-white flex items-center justify-center text-base font-semibold ring-2 ring-offset-2 ${verification.verified ? "ring-[#3F8F5F]" : "ring-[#C7D1CB]"
+                  }`}
+              >
+                {getInitials(worker.name)}
+              </span>
+            )}
+            {verification.verified && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#3F8F5F] border-2 border-white flex items-center justify-center">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+              </span>
+            )}
+          </div>
 
-        <div className="min-w-0 pt-0.5">
-          <p className="text-[15px] font-semibold text-[#12233D] truncate">
-            {worker.name}
-          </p>
-          {worker.professions && worker.professions.length > 0 && (
-            <p className="text-xs text-[#586268] truncate">
-              {worker.professions.map((p) => p.name).join(", ")}
+          <div className="min-w-0 pt-0.5">
+            <p className="text-[15px] font-semibold text-[#12233D] truncate">
+              {worker.name}
             </p>
-          )}
-          <p
-            className={`text-xs font-medium mt-0.5 ${
-              verification.verified
+            {worker.professions && worker.professions.length > 0 && (
+              <p className="text-xs text-[#586268] truncate">
+                {worker.professions.map((p) => p.name).join(", ")}
+              </p>
+            )}
+            <p
+              className={`text-xs font-medium mt-0.5 ${verification.verified
                 ? "text-[#2F6E48]"
                 : verification.pending
-                ? "text-[#C97F1E]"
-                : "text-[#B4402A]"
-            }`}
-          >
-            {verification.label}
-          </p>
+                  ? "text-[#C97F1E]"
+                  : "text-[#B4402A]"
+                }`}
+            >
+              {verification.label}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -257,7 +256,7 @@ export default function WorkersList() {
 
       {!loading && !error && workers.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
             {workers.map((worker) => (
               <WorkerCard
                 key={worker.id}

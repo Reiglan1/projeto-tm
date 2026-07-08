@@ -650,7 +650,7 @@ export default function ProfilePage() {
         </form>
       </div>
 
-      {user?.role === "worker" && <ReviewsList workerId={user.id} />}
+      {user && <ReviewsList subjectId={user.id} role={user.role} />}
 
       {/* Zona de risco */}
       <div className="bg-white border border-red-200 rounded-xl p-6">

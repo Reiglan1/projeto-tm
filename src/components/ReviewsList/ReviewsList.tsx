@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getReviewsByWorker } from "@/services/reviews";
+import { getReviewsByWorker, getReviewsByClient } from "@/services/reviews";
 import { ResponseReviewJason } from "@/types/review";
 import { ApiError } from "@/services/apiError";
 import StarRating from "@/components/StarRating/StarRating";
@@ -27,7 +27,12 @@ function initials(name: string): string {
     .join("");
 }
 
-export default function ReviewsList({ workerId }: { workerId: string }) {
+interface ReviewsListProps {
+  subjectId: string;
+  role: "worker" | "client";
+}
+
+export default function ReviewsList({ subjectId, role }: ReviewsListProps) {
   const [reviews, setReviews] = useState<ResponseReviewJason[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -37,13 +42,18 @@ export default function ReviewsList({ workerId }: { workerId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!workerId) return;
+    if (!subjectId) return;
 
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    getReviewsByWorker(workerId, { page, pageSize: PAGE_SIZE })
+    const request =
+      role === "worker"
+        ? getReviewsByWorker(subjectId, { page, pageSize: PAGE_SIZE })
+        : getReviewsByClient(subjectId, { page, pageSize: PAGE_SIZE });
+
+    request
       .then((response) => {
         if (cancelled) return;
         setReviews(response.items ?? []);
@@ -65,7 +75,7 @@ export default function ReviewsList({ workerId }: { workerId: string }) {
     return () => {
       cancelled = true;
     };
-  }, [workerId, page]);
+  }, [subjectId, role, page]);
 
   return (
     <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
@@ -85,7 +95,9 @@ export default function ReviewsList({ workerId }: { workerId: string }) {
 
       {!loading && !error && reviews.length === 0 && (
         <p className="text-sm text-[#586268]">
-          Você ainda não recebeu nenhuma avaliação.
+          {role === "worker"
+            ? "Você ainda não recebeu nenhuma avaliação."
+            : "Você ainda não recebeu nenhuma avaliação de profissionais."}
         </p>
       )}
 

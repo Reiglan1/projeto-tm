@@ -191,7 +191,7 @@ export default function WorkerProfilePage() {
       </div>
 
       {/* Avaliações */}
-      <ReviewsList workerId={worker.id} />
+      <ReviewsList subjectId={worker.id} role="worker" />
     </div>
   );
 }

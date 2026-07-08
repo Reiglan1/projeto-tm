@@ -18,3 +18,11 @@ export interface RequestUpdateClientJason {
   pixKey?: string;
   pixKeyType?: string;
 }
+
+export interface ResponseAllClientsJason {
+  items: ResponseClientDetailJason[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
