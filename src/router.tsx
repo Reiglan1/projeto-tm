@@ -21,6 +21,7 @@ const OpenServiceOrderPage = lazy(() => import("@/pages/app/OpenServiceOrder/Ope
 const WorkerProfilePage = lazy(() => import("@/pages/app/WorkerProfile/WorkerProfile"));
 const ClientProfilePage = lazy(() => import("@/pages/app/ClientProfile/ClientProfile"));
 const MyServiceOrdersPage = lazy(() => import("@/pages/app/MyServiceOrders/MyServiceOrders"));
+const ChatPage = lazy(() => import("@/pages/app/Chat/Chat"));
 const PaymentPage = lazy(() => import("@/pages/app/Home/sections/Payment"));
 const CategoriesPage = lazy(() => import("@/pages/app/Home/sections/Categories"));
 const ProfessionalWalletPage = lazy(() => import("@/pages/app/Wallet/Wallet"));
@@ -145,6 +146,11 @@ const RouterConfig = createBrowserRouter([
               {
                 path: ROUTES.MY_SERVICE_ORDERS,
                 Component: MyServiceOrdersPage,
+                errorElement: <ErrorElement />,
+              },
+              {
+                path: ROUTES.CHAT,
+                Component: ChatPage,
                 errorElement: <ErrorElement />,
               },
               {

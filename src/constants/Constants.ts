@@ -23,6 +23,8 @@ export const ROUTES = {
 
     PAYMENT: "/pagamento/:serviceOrderId",
 
+    CHAT: "/chamados/:serviceOrderId/chat",
+
     // Páginas que não estão logadas
     LOGIN: "/login",
 
@@ -47,6 +49,10 @@ export function buildClientProfilePath(clientId: string): string {
 
 export function buildPaymentPath(serviceOrderId: string): string {
     return `/pagamento/${serviceOrderId}`;
+}
+
+export function buildChatPath(serviceOrderId: string): string {
+    return `/chamados/${serviceOrderId}/chat`;
 }
 
 // // Mapeamento de rotas para nomes de páginas (para breadcrumbs)

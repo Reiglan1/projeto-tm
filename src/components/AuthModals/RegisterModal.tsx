@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal/Modal";
+import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import CategoryPicker from "@/components/CategoryPicker/CategoryPicker";
 import RoleTabs from "./RoleTabs";
 import { useLayout } from "@/context/LayoutProvider";
@@ -200,7 +201,7 @@ export default function RegisterModal({
       if (!response.token) {
         setConfirmationMessage(
           response.message ??
-            "Cadastro realizado! Confirme seu e-mail para poder entrar."
+          "Cadastro realizado! Confirme seu e-mail para poder entrar."
         );
         setStep("verify");
         return;
@@ -358,8 +359,8 @@ export default function RegisterModal({
             {cooldown > 0
               ? `Reenviar em ${cooldown}s`
               : resending
-              ? "Enviando..."
-              : "Reenviar código"}
+                ? "Enviando..."
+                : "Reenviar código"}
           </button>
         </p>
       </Modal>
@@ -379,9 +380,8 @@ export default function RegisterModal({
             type="text"
             value={form.name}
             onChange={(event) => updateField("name", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="Seu nome"
           />
           {fieldErrors.name && (
@@ -397,9 +397,8 @@ export default function RegisterModal({
             type="email"
             value={form.email}
             onChange={(event) => updateField("email", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="voce@email.com"
           />
           {fieldErrors.email && (
@@ -419,9 +418,8 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("cpf", maskCPF(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
               placeholder="000.000.000-00"
             />
             {fieldErrors.cpf && (
@@ -439,9 +437,8 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("phone", maskPhone(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-                fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
-              }`}
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
+                }`}
               placeholder="(00) 00000-0000"
             />
             {fieldErrors.phone && (
@@ -491,14 +488,12 @@ export default function RegisterModal({
           <label className="block text-sm font-medium text-[#12233D] mb-1.5">
             Senha
           </label>
-          <input
-            type="password"
+          <PasswordInput
             value={form.password}
             onFocus={() => setPasswordFocused(true)}
-            onChange={(event) => updateField("password", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            onChange={(value) => updateField("password", value)}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="••••••••"
           />
           {fieldErrors.password && (
@@ -510,9 +505,8 @@ export default function RegisterModal({
               {passwordRules.map((rule) => (
                 <li
                   key={rule.label}
-                  className={`text-xs flex items-center gap-1.5 ${
-                    rule.valid ? "text-green-600" : "text-[#586268]"
-                  }`}
+                  className={`text-xs flex items-center gap-1.5 ${rule.valid ? "text-green-600" : "text-[#586268]"
+                    }`}
                 >
                   <span>{rule.valid ? "✓" : "•"}</span>
                   {rule.label}
@@ -526,15 +520,11 @@ export default function RegisterModal({
           <label className="block text-sm font-medium text-[#12233D] mb-1.5">
             Confirmar senha
           </label>
-          <input
-            type="password"
+          <PasswordInput
             value={form.confirmPassword}
-            onChange={(event) =>
-              updateField("confirmPassword", event.target.value)
-            }
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
-            }`}
+            onChange={(value) => updateField("confirmPassword", value)}
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
+              }`}
             placeholder="••••••••"
           />
           {fieldErrors.confirmPassword && (

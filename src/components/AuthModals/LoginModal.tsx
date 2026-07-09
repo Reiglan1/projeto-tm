@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal/Modal";
+import PasswordInput from "@/components/PasswordInput/PasswordInput";
 import RoleTabs from "./RoleTabs";
 import { useLayout } from "@/context/LayoutProvider";
 import {
@@ -387,11 +388,10 @@ export default function LoginModal({
           <label className="block text-sm font-medium text-[#12233D] mb-1.5">
             Senha
           </label>
-          <input
-            type="password"
+          <PasswordInput
             value={password}
-            onChange={(event) => {
-              setPassword(event.target.value);
+            onChange={(value) => {
+              setPassword(value);
               setFieldErrors((current) => ({ ...current, password: undefined }));
             }}
             className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${

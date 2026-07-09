@@ -26,3 +26,14 @@ export interface ResponseAllClientsJason {
   pageSize: number;
   totalPages: number;
 }
+
+// Endpoint público/seguro (GET /api/clients/{id}/profile) — usado quando um
+// worker vê o perfil de um cliente. Diferente do ResponseClientDetailJason,
+// não expõe e-mail, telefone, status nem chave Pix.
+export interface ResponseClientProfileJason {
+  id: string;
+  name: string | null;
+  memberSince: string;
+  averageRating: number;
+  reviewCount: number;
+}
