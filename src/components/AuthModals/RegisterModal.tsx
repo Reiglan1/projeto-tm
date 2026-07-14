@@ -314,13 +314,13 @@ export default function RegisterModal({
   if (step === "verify") {
     return (
       <Modal open={open} onClose={resetAndClose} title="Confirme seu e-mail">
-        <p className="text-sm text-[#586268] mb-5">
+        <p className="text-sm text-[#3A3A3A] mb-5">
           {confirmationMessage}
         </p>
 
         <form onSubmit={handleVerifyAndLogin} noValidate className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Código de verificação
             </label>
             <input
@@ -328,7 +328,7 @@ export default function RegisterModal({
               inputMode="numeric"
               value={code}
               onChange={(event) => setCode(event.target.value)}
-              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] tracking-[4px] text-center focus:outline-none focus:border-[#12233D]"
+              className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] tracking-[4px] text-center focus:outline-none focus:border-[#0A0A0A]"
               placeholder="000000"
               autoFocus
             />
@@ -336,25 +336,25 @@ export default function RegisterModal({
 
           {verifyError && <p className="text-sm text-red-600">{verifyError}</p>}
           {resendMessage && (
-            <p className="text-sm text-[#2F6E48]">{resendMessage}</p>
+            <p className="text-sm text-[#1F8A5B]">{resendMessage}</p>
           )}
 
           <button
             type="submit"
             disabled={verifying}
-            className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {verifying ? "Verificando..." : "Confirmar e entrar"}
           </button>
         </form>
 
-        <p className="text-sm text-[#586268] text-center mt-5">
+        <p className="text-sm text-[#3A3A3A] text-center mt-5">
           Não recebeu?{" "}
           <button
             type="button"
             onClick={handleResend}
             disabled={resending || cooldown > 0}
-            className="text-[#12233D] font-semibold bg-transparent border-none cursor-pointer p-0 underline disabled:no-underline disabled:text-[#586268] disabled:cursor-not-allowed"
+            className="text-[#0A0A0A] font-semibold bg-transparent border-none cursor-pointer p-0 underline disabled:no-underline disabled:text-[#3A3A3A] disabled:cursor-not-allowed"
           >
             {cooldown > 0
               ? `Reenviar em ${cooldown}s`
@@ -373,14 +373,14 @@ export default function RegisterModal({
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             Nome completo
           </label>
           <input
             type="text"
             value={form.name}
             onChange={(event) => updateField("name", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.name ? "border-red-400" : "border-[#D9D6D0]"
               }`}
             placeholder="Seu nome"
           />
@@ -390,14 +390,14 @@ export default function RegisterModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             E-mail
           </label>
           <input
             type="email"
             value={form.email}
             onChange={(event) => updateField("email", event.target.value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.email ? "border-red-400" : "border-[#D9D6D0]"
               }`}
             placeholder="voce@email.com"
           />
@@ -408,7 +408,7 @@ export default function RegisterModal({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               CPF
             </label>
             <input
@@ -418,7 +418,7 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("cpf", maskCPF(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.cpf ? "border-red-400" : "border-[#C7D1CB]"
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.cpf ? "border-red-400" : "border-[#D9D6D0]"
                 }`}
               placeholder="000.000.000-00"
             />
@@ -427,7 +427,7 @@ export default function RegisterModal({
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Telefone
             </label>
             <input
@@ -437,7 +437,7 @@ export default function RegisterModal({
               onChange={(event) =>
                 updateField("phone", maskPhone(event.target.value))
               }
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.phone ? "border-red-400" : "border-[#D9D6D0]"
                 }`}
               placeholder="(00) 00000-0000"
             />
@@ -450,7 +450,7 @@ export default function RegisterModal({
         {role === "worker" && (
           <>
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
                 Categorias de serviço
               </label>
               <CategoryPicker
@@ -468,8 +468,8 @@ export default function RegisterModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-                Sobre você <span className="text-[#586268] font-normal">(opcional)</span>
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
+                Sobre você <span className="text-[#3A3A3A] font-normal">(opcional)</span>
               </label>
               <textarea
                 value={form.description}
@@ -477,7 +477,7 @@ export default function RegisterModal({
                   updateField("description", event.target.value)
                 }
                 rows={3}
-                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
                 placeholder="Conte um pouco da sua experiência para os clientes"
               />
             </div>
@@ -485,14 +485,14 @@ export default function RegisterModal({
         )}
 
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             Senha
           </label>
           <PasswordInput
             value={form.password}
             onFocus={() => setPasswordFocused(true)}
             onChange={(value) => updateField("password", value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.password ? "border-red-400" : "border-[#D9D6D0]"
               }`}
             placeholder="••••••••"
           />
@@ -505,7 +505,7 @@ export default function RegisterModal({
               {passwordRules.map((rule) => (
                 <li
                   key={rule.label}
-                  className={`text-xs flex items-center gap-1.5 ${rule.valid ? "text-green-600" : "text-[#586268]"
+                  className={`text-xs flex items-center gap-1.5 ${rule.valid ? "text-green-600" : "text-[#3A3A3A]"
                     }`}
                 >
                   <span>{rule.valid ? "✓" : "•"}</span>
@@ -517,13 +517,13 @@ export default function RegisterModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             Confirmar senha
           </label>
           <PasswordInput
             value={form.confirmPassword}
             onChange={(value) => updateField("confirmPassword", value)}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.confirmPassword ? "border-red-400" : "border-[#C7D1CB]"
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.confirmPassword ? "border-red-400" : "border-[#D9D6D0]"
               }`}
             placeholder="••••••••"
           />
@@ -535,7 +535,7 @@ export default function RegisterModal({
         </div>
 
         <div>
-          <label className="flex items-start gap-2 text-sm text-[#586268]">
+          <label className="flex items-start gap-2 text-sm text-[#3A3A3A]">
             <input
               type="checkbox"
               checked={form.acceptTerms}
@@ -558,18 +558,18 @@ export default function RegisterModal({
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#12233D] border-none text-white px-[22px] py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full bg-[#0A0A0A] border-none text-white px-[22px] py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
       </form>
 
-      <p className="text-sm text-[#586268] text-center mt-5">
+      <p className="text-sm text-[#3A3A3A] text-center mt-5">
         Já tem uma conta?{" "}
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="text-[#12233D] font-semibold bg-transparent border-none cursor-pointer p-0 underline"
+          className="text-[#0A0A0A] font-semibold bg-transparent border-none cursor-pointer p-0 underline"
         >
           Entrar
         </button>

@@ -23,13 +23,13 @@ function getStatusMeta(status?: string): {
 } {
     switch ((status ?? "").toUpperCase()) {
         case "ACTIVE":
-            return { label: "Ativo", dotClass: "bg-[#3F8F5F]", textClass: "text-[#2F6E48]" };
+            return { label: "Ativo", dotClass: "bg-[#26A06D]", textClass: "text-[#1F8A5B]" };
         case "INACTIVE":
         case "SUSPENDED":
         case "BLOCKED":
-            return { label: "Inativo", dotClass: "bg-[#B4402A]", textClass: "text-[#B4402A]" };
+            return { label: "Inativo", dotClass: "bg-[#E63946]", textClass: "text-[#E63946]" };
         default:
-            return { label: status ?? "—", dotClass: "bg-[#586268]", textClass: "text-[#586268]" };
+            return { label: status ?? "—", dotClass: "bg-[#3A3A3A]", textClass: "text-[#3A3A3A]" };
     }
 }
 
@@ -42,18 +42,18 @@ function ClientCard({ client }: { client: ResponseClientDetailJason }) {
             onClick={() => navigate(buildClientProfilePath(client.id))}
             role="button"
             tabIndex={0}
-            className="bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 h-full cursor-pointer transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
+            className="bg-white border border-[#D9D6D0] rounded-xl p-5 flex flex-col gap-4 h-full cursor-pointer transition-all duration-200 hover:border-[#0A0A0A]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
         >
             <div className="flex items-center gap-3.5">
-                <span className="w-14 h-14 rounded-full bg-[#12233D] text-white flex items-center justify-center text-base font-semibold shrink-0">
+                <span className="w-14 h-14 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center text-base font-semibold shrink-0">
                     {getInitials(client.name)}
                 </span>
                 <div className="min-w-0">
-                    <p className="text-[15px] font-semibold text-[#12233D] truncate">
+                    <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">
                         {client.name}
                     </p>
                     <p
-                        className={`text-xs font-medium mt-0.5 ${client.emailVerified ? "text-[#2F6E48]" : "text-[#C97F1E]"
+                        className={`text-xs font-medium mt-0.5 ${client.emailVerified ? "text-[#1F8A5B]" : "text-[#C99A00]"
                             }`}
                     >
                         {client.emailVerified ? "E-mail verificado" : "E-mail não verificado"}
@@ -61,15 +61,15 @@ function ClientCard({ client }: { client: ResponseClientDetailJason }) {
                 </div>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-[#586268]">
+            <div className="flex items-center gap-2 text-sm text-[#3A3A3A]">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
                 {maskPhone(client.phone)}
             </div>
 
-            <div className="flex items-center justify-end pt-3.5 border-t border-[#F1F4F2] mt-auto">
-                <span className="flex items-center gap-1.5 text-xs font-medium text-[#586268]">
+            <div className="flex items-center justify-end pt-3.5 border-t border-[#F5F2EC] mt-auto">
+                <span className="flex items-center gap-1.5 text-xs font-medium text-[#3A3A3A]">
                     <span className={`w-1.5 h-1.5 rounded-full ${status.dotClass}`} />
                     <span className={status.textClass}>{status.label}</span>
                 </span>
@@ -117,18 +117,18 @@ export default function ClientsList() {
     return (
         <section className="max-w-[1180px] mx-auto px-6 sm:px-10 py-10">
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#12233D]">Clientes na plataforma</h2>
+                <h2 className="text-xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Clientes na plataforma</h2>
                 {!loading && !error && (
-                    <p className="text-sm text-[#586268]">{totalCount} encontrados</p>
+                    <p className="text-sm text-[#3A3A3A]">{totalCount} encontrados</p>
                 )}
             </div>
 
-            {loading && <p className="text-sm text-[#586268]">Carregando clientes...</p>}
+            {loading && <p className="text-sm text-[#3A3A3A]">Carregando clientes...</p>}
 
             {!loading && error && <p className="text-sm text-red-600">{error}</p>}
 
             {!loading && !error && clients.length === 0 && (
-                <p className="text-sm text-[#586268]">Nenhum cliente encontrado.</p>
+                <p className="text-sm text-[#3A3A3A]">Nenhum cliente encontrado.</p>
             )}
 
             {!loading && !error && clients.length > 0 && (
@@ -144,11 +144,11 @@ export default function ClientsList() {
                             <button
                                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                                 disabled={page <= 1}
-                                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 Anterior
                             </button>
-                            <span className="text-sm text-[#586268]">
+                            <span className="text-sm text-[#3A3A3A]">
                                 Página {page} de {totalPages}
                             </span>
                             <button
@@ -156,7 +156,7 @@ export default function ClientsList() {
                                     setPage((current) => Math.min(totalPages, current + 1))
                                 }
                                 disabled={page >= totalPages}
-                                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 Próxima
                             </button>

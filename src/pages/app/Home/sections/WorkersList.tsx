@@ -7,6 +7,7 @@ import { maskPhone } from "@/utils/Masks";
 import { useLayout } from "@/context/LayoutProvider";
 import { buildOpenServiceOrderPath, buildWorkerProfilePath } from "@/constants/Constants";
 import WorkersSearchBar from "@/pages/app/Home/sections/WorkersSearchBar";
+import { useReveal } from "@/hooks/useReveal";
 
 const PAGE_SIZE = 9;
 
@@ -27,13 +28,13 @@ interface StatusMeta {
 function getStatusMeta(status?: string): StatusMeta {
   switch ((status ?? "").toUpperCase()) {
     case "ACTIVE":
-      return { label: "Ativo", dotClass: "bg-[#3F8F5F]", textClass: "text-[#2F6E48]" };
+      return { label: "Ativo", dotClass: "bg-[#26A06D]", textClass: "text-[#1F8A5B]" };
     case "INACTIVE":
     case "SUSPENDED":
     case "BLOCKED":
-      return { label: "Inativo", dotClass: "bg-[#B4402A]", textClass: "text-[#B4402A]" };
+      return { label: "Inativo", dotClass: "bg-[#E63946]", textClass: "text-[#E63946]" };
     default:
-      return { label: status ?? "—", dotClass: "bg-[#586268]", textClass: "text-[#586268]" };
+      return { label: status ?? "—", dotClass: "bg-[#3A3A3A]", textClass: "text-[#3A3A3A]" };
   }
 }
 
@@ -72,7 +73,7 @@ function WorkerCard({
       onClick={() => navigate(buildWorkerProfilePath(worker.id))}
       role="button"
       tabIndex={0}
-      className="group bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-4 h-full cursor-pointer transition-all duration-200 hover:border-[#12233D]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
+      className="group bg-white border border-[#D9D6D0] rounded-xl p-5 flex flex-col gap-4 h-full cursor-pointer transition-all duration-200 hover:border-[#0A0A0A]/30 hover:shadow-[0_12px_24px_-16px_rgba(18,35,61,0.35)] hover:-translate-y-0.5"
     >
       <div className="flex flex-col gap-4 flex-1">
         <div className="flex items-start gap-3.5">
@@ -81,19 +82,19 @@ function WorkerCard({
               <img
                 src={worker.profilePhotoUrl}
                 alt={worker.name}
-                className={`w-14 h-14 rounded-full object-cover ring-2 ring-offset-2 ${verification.verified ? "ring-[#3F8F5F]" : "ring-[#C7D1CB]"
+                className={`w-14 h-14 rounded-full object-cover ring-2 ring-offset-2 ${verification.verified ? "ring-[#26A06D]" : "ring-[#D9D6D0]"
                   }`}
               />
             ) : (
               <span
-                className={`w-14 h-14 rounded-full bg-[#12233D] text-white flex items-center justify-center text-base font-semibold ring-2 ring-offset-2 ${verification.verified ? "ring-[#3F8F5F]" : "ring-[#C7D1CB]"
+                className={`w-14 h-14 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center text-base font-semibold ring-2 ring-offset-2 ${verification.verified ? "ring-[#26A06D]" : "ring-[#D9D6D0]"
                   }`}
               >
                 {getInitials(worker.name)}
               </span>
             )}
             {verification.verified && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#3F8F5F] border-2 border-white flex items-center justify-center">
+              <span className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-[#26A06D] border-2 border-white flex items-center justify-center">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 6L9 17l-5-5" />
                 </svg>
@@ -102,20 +103,20 @@ function WorkerCard({
           </div>
 
           <div className="min-w-0 pt-0.5">
-            <p className="text-[15px] font-semibold text-[#12233D] truncate">
+            <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">
               {worker.name}
             </p>
             {worker.professions && worker.professions.length > 0 && (
-              <p className="text-xs text-[#586268] truncate">
+              <p className="text-xs text-[#3A3A3A] truncate">
                 {worker.professions.map((p) => p.name).join(", ")}
               </p>
             )}
             <p
               className={`text-xs font-medium mt-0.5 ${verification.verified
-                ? "text-[#2F6E48]"
+                ? "text-[#1F8A5B]"
                 : verification.pending
-                  ? "text-[#C97F1E]"
-                  : "text-[#B4402A]"
+                  ? "text-[#C99A00]"
+                  : "text-[#E63946]"
                 }`}
             >
               {verification.label}
@@ -125,10 +126,10 @@ function WorkerCard({
       </div>
 
       {hasDescription && (
-        <p className="text-sm text-[#586268] line-clamp-2">{worker.description}</p>
+        <p className="text-sm text-[#3A3A3A] line-clamp-2">{worker.description}</p>
       )}
 
-      <div className="flex items-center gap-4 text-sm text-[#586268]">
+      <div className="flex items-center gap-4 text-sm text-[#3A3A3A]">
         <span className="flex items-center gap-2">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
@@ -137,19 +138,19 @@ function WorkerCard({
         </span>
 
         {hasReviews && (
-          <span className="flex items-center gap-1 text-[#C97F1E] font-medium">
+          <span className="flex items-center gap-1 text-[#C99A00] font-medium">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
             {worker.averageRating.toFixed(1)}
-            <span className="text-[#586268] font-normal">({worker.reviewCount})</span>
+            <span className="text-[#3A3A3A] font-normal">({worker.reviewCount})</span>
           </span>
         )}
       </div>
 
-      <div className="flex items-center justify-between pt-3.5 border-t border-[#F1F4F2]">
+      <div className="flex items-center justify-between pt-3.5 border-t border-[#F5F2EC]">
         {worker.available24Hours ? (
-          <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#C97F1E]">
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#C99A00]">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 6v6l4 2" />
               <circle cx="12" cy="12" r="10" />
@@ -160,7 +161,7 @@ function WorkerCard({
           <span />
         )}
 
-        <span className="flex items-center gap-1.5 text-xs font-medium text-[#586268]">
+        <span className="flex items-center gap-1.5 text-xs font-medium text-[#3A3A3A]">
           <span className={`w-1.5 h-1.5 rounded-full ${status.dotClass}`} />
           <span className={status.textClass}>{status.label}</span>
         </span>
@@ -172,7 +173,7 @@ function WorkerCard({
             event.stopPropagation();
             navigate(buildOpenServiceOrderPath(worker.id));
           }}
-          className="w-full bg-[#12233D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150"
+          className="w-full bg-[#0A0A0A] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150"
         >
           Solicitar serviço
         </button>
@@ -182,6 +183,7 @@ function WorkerCard({
 }
 
 export default function WorkersList() {
+  const scopeRef = useReveal<HTMLElement>();
   const { user } = useLayout();
   const [workers, setWorkers] = useState<ResponseWorkerDetailJason[]>([]);
   const [page, setPage] = useState(1);
@@ -226,20 +228,20 @@ export default function WorkersList() {
   }, [page, search]);
 
   return (
-    <section className="max-w-[1180px] mx-auto px-6 sm:px-10 py-10">
+    <section ref={scopeRef} className="max-w-[1180px] mx-auto px-6 sm:px-10 py-10">
       <WorkersSearchBar onSearch={handleSearch} />
 
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-[#12233D]">
+        <h2 className="text-xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Profissionais disponíveis
         </h2>
         {!loading && !error && (
-          <p className="text-sm text-[#586268]">{totalCount} encontrados</p>
+          <p className="text-sm text-[#3A3A3A]">{totalCount} encontrados</p>
         )}
       </div>
 
       {loading && (
-        <p className="text-sm text-[#586268]">Carregando profissionais...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando profissionais...</p>
       )}
 
       {!loading && error && (
@@ -247,7 +249,7 @@ export default function WorkersList() {
       )}
 
       {!loading && !error && workers.length === 0 && (
-        <p className="text-sm text-[#586268]">
+        <p className="text-sm text-[#3A3A3A]">
           {search
             ? `Nenhum profissional encontrado para "${search}".`
             : "Nenhum profissional encontrado."}
@@ -271,11 +273,11 @@ export default function WorkersList() {
               <button
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={page <= 1}
-                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Anterior
               </button>
-              <span className="text-sm text-[#586268]">
+              <span className="text-sm text-[#3A3A3A]">
                 Página {page} de {totalPages}
               </span>
               <button
@@ -283,7 +285,7 @@ export default function WorkersList() {
                   setPage((current) => Math.min(totalPages, current + 1))
                 }
                 disabled={page >= totalPages}
-                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Próxima
               </button>

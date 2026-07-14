@@ -227,22 +227,22 @@ export default function LoginModal({
       <Modal open={open} onClose={resetAndClose} title="Redefinir senha">
         {forgotSent ? (
           <div>
-            <p className="text-sm text-[#586268]">
+            <p className="text-sm text-[#3A3A3A]">
               Se existir uma conta com o e-mail{" "}
-              <strong className="text-[#12233D]">{email}</strong>, enviamos um
+              <strong className="text-[#0A0A0A]">{email}</strong>, enviamos um
               link pra você redefinir sua senha. Confira sua caixa de entrada.
             </p>
             <button
               type="button"
               onClick={() => setStep("login")}
-              className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 mt-5"
+              className="w-full bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 mt-5"
             >
               Voltar para o login
             </button>
           </div>
         ) : (
           <>
-            <p className="text-sm text-[#586268] mb-5">
+            <p className="text-sm text-[#3A3A3A] mb-5">
               Informe seu e-mail e o tipo de conta — vamos te mandar um link
               pra criar uma nova senha.
             </p>
@@ -251,14 +251,14 @@ export default function LoginModal({
 
             <form onSubmit={handleForgotSubmit} noValidate className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+                <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
                   E-mail
                 </label>
                 <input
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+                  className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
                   placeholder="voce@email.com"
                   autoFocus
                 />
@@ -269,17 +269,17 @@ export default function LoginModal({
               <button
                 type="submit"
                 disabled={forgotLoading}
-                className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {forgotLoading ? "Enviando..." : "Enviar link de redefinição"}
               </button>
             </form>
 
-            <p className="text-sm text-[#586268] text-center mt-5">
+            <p className="text-sm text-[#3A3A3A] text-center mt-5">
               <button
                 type="button"
                 onClick={() => setStep("login")}
-                className="text-[#586268] bg-transparent border-none cursor-pointer p-0 underline"
+                className="text-[#3A3A3A] bg-transparent border-none cursor-pointer p-0 underline"
               >
                 Voltar
               </button>
@@ -293,15 +293,15 @@ export default function LoginModal({
   if (step === "verify") {
     return (
       <Modal open={open} onClose={resetAndClose} title="Confirme seu e-mail">
-        <p className="text-sm text-[#586268] mb-5">
+        <p className="text-sm text-[#3A3A3A] mb-5">
           Sua conta ainda não foi verificada. Enviamos um código para{" "}
-          <strong className="text-[#12233D]">{email}</strong> — digite abaixo
+          <strong className="text-[#0A0A0A]">{email}</strong> — digite abaixo
           para continuar.
         </p>
 
         <form onSubmit={handleVerifyAndLogin} noValidate className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Código de verificação
             </label>
             <input
@@ -309,7 +309,7 @@ export default function LoginModal({
               inputMode="numeric"
               value={code}
               onChange={(event) => setCode(event.target.value)}
-              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] tracking-[4px] text-center focus:outline-none focus:border-[#12233D]"
+              className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] tracking-[4px] text-center focus:outline-none focus:border-[#0A0A0A]"
               placeholder="000000"
               autoFocus
             />
@@ -317,25 +317,25 @@ export default function LoginModal({
 
           {verifyError && <p className="text-sm text-red-600">{verifyError}</p>}
           {resendMessage && (
-            <p className="text-sm text-[#2F6E48]">{resendMessage}</p>
+            <p className="text-sm text-[#1F8A5B]">{resendMessage}</p>
           )}
 
           <button
             type="submit"
             disabled={verifying}
-            className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {verifying ? "Verificando..." : "Confirmar e entrar"}
           </button>
         </form>
 
-        <p className="text-sm text-[#586268] text-center mt-5">
+        <p className="text-sm text-[#3A3A3A] text-center mt-5">
           Não recebeu?{" "}
           <button
             type="button"
             onClick={handleResend}
             disabled={resending || cooldown > 0}
-            className="text-[#12233D] font-semibold bg-transparent border-none cursor-pointer p-0 underline disabled:no-underline disabled:text-[#586268] disabled:cursor-not-allowed"
+            className="text-[#0A0A0A] font-semibold bg-transparent border-none cursor-pointer p-0 underline disabled:no-underline disabled:text-[#3A3A3A] disabled:cursor-not-allowed"
           >
             {cooldown > 0
               ? `Reenviar em ${cooldown}s`
@@ -345,11 +345,11 @@ export default function LoginModal({
           </button>
         </p>
 
-        <p className="text-sm text-[#586268] text-center mt-2">
+        <p className="text-sm text-[#3A3A3A] text-center mt-2">
           <button
             type="button"
             onClick={() => setStep("login")}
-            className="text-[#586268] bg-transparent border-none cursor-pointer p-0 underline"
+            className="text-[#3A3A3A] bg-transparent border-none cursor-pointer p-0 underline"
           >
             Voltar
           </button>
@@ -364,7 +364,7 @@ export default function LoginModal({
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             E-mail
           </label>
           <input
@@ -374,8 +374,8 @@ export default function LoginModal({
               setEmail(event.target.value);
               setFieldErrors((current) => ({ ...current, email: undefined }));
             }}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.email ? "border-red-400" : "border-[#C7D1CB]"
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${
+              fieldErrors.email ? "border-red-400" : "border-[#D9D6D0]"
             }`}
             placeholder="voce@email.com"
           />
@@ -385,7 +385,7 @@ export default function LoginModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             Senha
           </label>
           <PasswordInput
@@ -394,8 +394,8 @@ export default function LoginModal({
               setPassword(value);
               setFieldErrors((current) => ({ ...current, password: undefined }));
             }}
-            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-              fieldErrors.password ? "border-red-400" : "border-[#C7D1CB]"
+            className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${
+              fieldErrors.password ? "border-red-400" : "border-[#D9D6D0]"
             }`}
             placeholder="••••••••"
           />
@@ -405,7 +405,7 @@ export default function LoginModal({
           <button
             type="button"
             onClick={() => setStep("forgot")}
-            className="text-xs text-[#3E6990] font-medium bg-transparent border-none cursor-pointer p-0 mt-1.5 underline"
+            className="text-xs text-[#3A3A3A] font-medium bg-transparent border-none cursor-pointer p-0 mt-1.5 underline"
           >
             Esqueci minha senha
           </button>
@@ -416,18 +416,18 @@ export default function LoginModal({
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-[#12233D] border-none text-white px-[22px] py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full bg-[#0A0A0A] border-none text-white px-[22px] py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {loading ? "Entrando..." : "Entrar"}
         </button>
       </form>
 
-      <p className="text-sm text-[#586268] text-center mt-5">
+      <p className="text-sm text-[#3A3A3A] text-center mt-5">
         Não tem uma conta?{" "}
         <button
           type="button"
           onClick={onSwitchToRegister}
-          className="text-[#12233D] font-semibold bg-transparent border-none cursor-pointer p-0 underline"
+          className="text-[#0A0A0A] font-semibold bg-transparent border-none cursor-pointer p-0 underline"
         >
           Cadastre-se
         </button>

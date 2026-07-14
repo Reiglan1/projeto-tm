@@ -295,7 +295,7 @@ export default function ChatPage() {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <p className="text-sm text-[#586268]">Carregando conversa...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando conversa...</p>
       </div>
     );
   }
@@ -306,7 +306,7 @@ export default function ChatPage() {
         <p className="text-sm text-red-600">{loadError}</p>
         <button
           onClick={() => navigate(ROUTES.MY_SERVICE_ORDERS)}
-          className="text-sm text-[#3E6990] font-medium underline self-start"
+          className="text-sm text-[#3A3A3A] font-medium underline self-start"
         >
           Voltar pros meus chamados
         </button>
@@ -317,20 +317,20 @@ export default function ChatPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 flex flex-col h-[calc(100vh-80px)]">
       {/* Cabeçalho */}
-      <div className="flex items-center gap-3 pb-4 border-b border-[#F1F4F2]">
+      <div className="flex items-center gap-3 pb-4 border-b border-[#F5F2EC]">
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full flex items-center justify-center text-[#12233D] hover:bg-[#F1F4F2] transition-colors duration-150 bg-transparent border-none cursor-pointer shrink-0"
+          className="w-9 h-9 rounded-full flex items-center justify-center text-[#0A0A0A] hover:bg-[#F5F2EC] transition-colors duration-150 bg-transparent border-none cursor-pointer shrink-0"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
         </button>
         <div className="min-w-0">
-          <p className="text-[15px] font-semibold text-[#12233D] truncate">
+          <p className="text-[15px] font-semibold text-[#0A0A0A] truncate">
             {counterpartName ?? "Conversa"}
           </p>
-          <p className="text-xs text-[#586268] truncate">{order?.categoryName}</p>
+          <p className="text-xs text-[#3A3A3A] truncate">{order?.categoryName}</p>
         </div>
       </div>
 
@@ -340,14 +340,14 @@ export default function ChatPage() {
           <button
             onClick={loadMoreMessages}
             disabled={loadingMore}
-            className="text-xs text-[#3E6990] font-medium underline bg-transparent border-none cursor-pointer self-center mb-2 disabled:opacity-60"
+            className="text-xs text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer self-center mb-2 disabled:opacity-60"
           >
             {loadingMore ? "Carregando..." : "Carregar mensagens anteriores"}
           </button>
         )}
 
         {messages.length === 0 && (
-          <p className="text-sm text-[#586268] text-center mt-10">
+          <p className="text-sm text-[#3A3A3A] text-center mt-10">
             Nenhuma mensagem ainda. Diga oi 👋
           </p>
         )}
@@ -361,15 +361,15 @@ export default function ChatPage() {
           return (
             <div key={message.id}>
               {showDayDivider && (
-                <p className="text-center text-xs text-[#586268] my-3">
+                <p className="text-center text-xs text-[#3A3A3A] my-3">
                   {formatDay(message.createdAt)}
                 </p>
               )}
               <div className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[75%] rounded-xl px-3.5 py-2.5 ${isMine
-                    ? "bg-[#12233D] text-white rounded-br-sm"
-                    : "bg-[#F1F4F2] text-[#12233D] rounded-bl-sm"
+                    ? "bg-[#0A0A0A] text-white rounded-br-sm"
+                    : "bg-[#F5F2EC] text-[#0A0A0A] rounded-bl-sm"
                     }`}
                 >
                   {kind === "image" && message.mediaUrl && (
@@ -394,7 +394,7 @@ export default function ChatPage() {
                       <a href={message.mediaUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className={`flex items-center gap-2 text-sm underline mb-1.5 ${isMine ? "text-white" : "text-[#3E6990]"
+                      className={`flex items-center gap-2 text-sm underline mb-1.5 ${isMine ? "text-white" : "text-[#3A3A3A]"
                         }`}
                     >
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
@@ -412,7 +412,7 @@ export default function ChatPage() {
                   )}
 
                   <div
-                    className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${isMine ? "text-white/60" : "text-[#586268]"
+                    className={`flex items-center justify-end gap-1 mt-1 text-[10px] ${isMine ? "text-white/60" : "text-[#3A3A3A]"
                       }`}
                   >
                     {formatTime(message.createdAt)}
@@ -427,14 +427,14 @@ export default function ChatPage() {
         })}
 
         {otherTyping && (
-          <p className="text-xs text-[#586268] italic">digitando...</p>
+          <p className="text-xs text-[#3A3A3A] italic">digitando...</p>
         )}
 
         <div ref={bottomRef} />
       </div>
 
       {/* Composer */}
-      <form onSubmit={handleSend} className="flex items-end gap-2 pt-3 border-t border-[#F1F4F2]">
+      <form onSubmit={handleSend} className="flex items-end gap-2 pt-3 border-t border-[#F5F2EC]">
         <input
           ref={fileInputRef}
           type="file"
@@ -446,7 +446,7 @@ export default function ChatPage() {
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploadingMedia}
-          className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[#586268] hover:bg-[#F1F4F2] transition-colors duration-150 bg-transparent border border-[#C7D1CB] cursor-pointer disabled:opacity-60"
+          className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-[#3A3A3A] hover:bg-[#F5F2EC] transition-colors duration-150 bg-transparent border border-[#D9D6D0] cursor-pointer disabled:opacity-60"
           title="Anexar foto, vídeo ou arquivo"
         >
           {uploadingMedia ? (
@@ -469,13 +469,13 @@ export default function ChatPage() {
           }}
           rows={1}
           placeholder="Digite sua mensagem..."
-          className="flex-1 border border-[#C7D1CB] rounded-xl px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none max-h-32"
+          className="flex-1 border border-[#D9D6D0] rounded-xl px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none max-h-32"
         />
 
         <button
           type="submit"
           disabled={sending || !text.trim()}
-          className="w-10 h-10 shrink-0 rounded-full bg-[#12233D] border-none text-white flex items-center justify-center cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-10 h-10 shrink-0 rounded-full bg-[#0A0A0A] border-none text-white flex items-center justify-center cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" />

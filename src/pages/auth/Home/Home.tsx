@@ -28,7 +28,7 @@ export default function HomeAuthPage() {
                 onClose={closeSessionExpiredModal}
                 title="Sessão expirada"
             >
-                <p className="text-sm text-[#586268] mb-6">
+                <p className="text-sm text-[#3A3A3A] mb-6">
                     Sua sessão expirou. Faça login novamente pra continuar.
                 </p>
                 <button
@@ -36,7 +36,7 @@ export default function HomeAuthPage() {
                         closeSessionExpiredModal();
                         openLogin();
                     }}
-                    className="w-full bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150"
+                    className="w-full bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150"
                 >
                     Entrar
                 </button>

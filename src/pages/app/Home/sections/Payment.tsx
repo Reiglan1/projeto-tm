@@ -6,6 +6,7 @@ import { getServiceOrderById } from "@/services/serviceOrder";
 import {
   getPaymentByServiceOrder,
   initiatePayment,
+  confirmPayment,
 } from "@/services/payments";
 import { openDispute } from "@/services/disputes";
 import { ApiError } from "@/services/apiError";
@@ -23,15 +24,15 @@ function paymentStatusLabel(payment: PaymentRecord): { label: string; className:
   const raw = (payment.status ?? "").toString().toUpperCase();
 
   if (raw.includes("APPROV") || raw.includes("PAID") || raw.includes("SUCCESS")) {
-    return { label: "Pagamento aprovado", className: "bg-[#3F8F5F]/10 text-[#2F6E48]" };
+    return { label: "Pagamento aprovado", className: "bg-[#26A06D]/10 text-[#1F8A5B]" };
   }
   if (raw.includes("ESCROW")) {
-    return { label: "Pago — retido até concluir o serviço", className: "bg-[#3E6990]/10 text-[#3E6990]" };
+    return { label: "Pago — retido até concluir o serviço", className: "bg-[#F5C518]/15 text-[#3A3A3A]" };
   }
   if (raw.includes("REJECT") || raw.includes("FAIL") || raw.includes("CANCEL")) {
     return { label: "Pagamento não aprovado", className: "bg-red-50 text-red-600" };
   }
-  return { label: raw || "Aguardando pagamento", className: "bg-[#E8A33D]/15 text-[#C97F1E]" };
+  return { label: raw || "Aguardando pagamento", className: "bg-[#F5C518]/15 text-[#C99A00]" };
 }
 
 export default function PaymentPage() {
@@ -172,6 +173,20 @@ export default function PaymentPage() {
     setRefreshError(null);
 
     try {
+      // confirmPayment consulta o provedor (Mercado Pago/Efí) na hora, em vez
+      // de só reler o que já está salvo no nosso banco — mais confiável se o
+      // webhook do provedor ainda não chegou. Se falhar (ex: método sem essa
+      // etapa), cai pro refresh comum.
+      if (payment?.id) {
+        try {
+          const confirmed = await confirmPayment(payment.id);
+          setPayment(confirmed);
+          return;
+        } catch {
+          // segue pro fallback abaixo
+        }
+      }
+
       const result = await getPaymentByServiceOrder(serviceOrderId);
       setPayment(result);
     } catch (error) {
@@ -187,7 +202,7 @@ export default function PaymentPage() {
   if (loading) {
     return (
       <div className="max-w-xl mx-auto px-6 py-10">
-        <p className="text-sm text-[#586268]">Carregando...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando...</p>
       </div>
     );
   }
@@ -205,25 +220,25 @@ export default function PaymentPage() {
   return (
     <div className="max-w-xl mx-auto px-6 py-10 flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#12233D]">Pagamento</h1>
-        <p className="text-sm text-[#586268] mt-1">
+        <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Pagamento</h1>
+        <p className="text-sm text-[#3A3A3A] mt-1">
           Chamado de {order.categoryName} com {order.workerName}
         </p>
       </div>
 
       {/* Resumo do chamado */}
-      <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
+      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
         <div className="flex items-center justify-between text-sm mb-2">
-          <span className="text-[#586268]">Serviço</span>
-          <span className="text-[#12233D] font-medium">{order.categoryName}</span>
+          <span className="text-[#3A3A3A]">Serviço</span>
+          <span className="text-[#0A0A0A] font-medium">{order.categoryName}</span>
         </div>
         <div className="flex items-center justify-between text-sm mb-2">
-          <span className="text-[#586268]">Profissional</span>
-          <span className="text-[#12233D] font-medium">{order.workerName}</span>
+          <span className="text-[#3A3A3A]">Profissional</span>
+          <span className="text-[#0A0A0A] font-medium">{order.workerName}</span>
         </div>
-        <div className="flex items-center justify-between text-sm pt-2 mt-2 border-t border-[#F1F4F2]">
-          <span className="text-[#586268]">Valor</span>
-          <span className="text-[#12233D] font-bold text-base">
+        <div className="flex items-center justify-between text-sm pt-2 mt-2 border-t border-[#F5F2EC]">
+          <span className="text-[#3A3A3A]">Valor</span>
+          <span className="text-[#0A0A0A] font-bold text-base">
             {formatCurrency(order.value)}
           </span>
         </div>
@@ -234,9 +249,9 @@ export default function PaymentPage() {
         <form
           onSubmit={handleInitiate}
           noValidate
-          className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex flex-col gap-4"
+          className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex flex-col gap-4"
         >
-          <h2 className="text-sm font-semibold text-[#12233D]">
+          <h2 className="text-sm font-semibold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
             Como você quer pagar?
           </h2>
 
@@ -245,8 +260,8 @@ export default function PaymentPage() {
               type="button"
               onClick={() => setPaymentMethod("pix")}
               className={`flex-1 border rounded-md px-4 py-2.5 text-[13px] font-semibold cursor-pointer transition-colors duration-150 ${paymentMethod === "pix"
-                ? "bg-[#12233D] border-[#12233D] text-white"
-                : "bg-transparent border-[#C7D1CB] text-[#12233D] hover:border-[#12233D]"
+                ? "bg-[#0A0A0A] border-[#0A0A0A] text-white"
+                : "bg-transparent border-[#D9D6D0] text-[#0A0A0A] hover:border-[#0A0A0A]"
                 }`}
             >
               Pix
@@ -255,8 +270,8 @@ export default function PaymentPage() {
               type="button"
               onClick={() => setPaymentMethod("wallet")}
               className={`flex-1 border rounded-md px-4 py-2.5 text-[13px] font-semibold cursor-pointer transition-colors duration-150 ${paymentMethod === "wallet"
-                ? "bg-[#12233D] border-[#12233D] text-white"
-                : "bg-transparent border-[#C7D1CB] text-[#12233D] hover:border-[#12233D]"
+                ? "bg-[#0A0A0A] border-[#0A0A0A] text-white"
+                : "bg-transparent border-[#D9D6D0] text-[#0A0A0A] hover:border-[#0A0A0A]"
                 }`}
             >
               Saldo da carteira
@@ -265,21 +280,21 @@ export default function PaymentPage() {
 
           {paymentMethod === "pix" && (
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
                 E-mail para confirmação
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
                 placeholder="voce@email.com"
               />
             </div>
           )}
 
           {paymentMethod === "wallet" && (
-            <p className="text-sm text-[#586268]">
+            <p className="text-sm text-[#3A3A3A]">
               O valor será debitado do saldo da sua carteira. Se o saldo for
               insuficiente, o pagamento será recusado.
             </p>
@@ -292,7 +307,7 @@ export default function PaymentPage() {
           <button
             type="submit"
             disabled={initiating}
-            className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {initiating
               ? "Processando..."
@@ -305,7 +320,7 @@ export default function PaymentPage() {
 
       {/* Pagamento já iniciado */}
       {payment && (
-        <div className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex flex-col gap-4">
+        <div className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex flex-col gap-4">
           <span
             className={`inline-block self-start text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${paymentStatusLabel(payment).className}`}
           >
@@ -328,20 +343,20 @@ export default function PaymentPage() {
 
           {payment.qrCode && (
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
                 PIX copia e cola
               </label>
               <textarea
                 readOnly
                 value={payment.qrCode}
                 rows={3}
-                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-xs text-[#586268] resize-none"
+                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-xs text-[#3A3A3A] resize-none"
                 onClick={(event) => event.currentTarget.select()}
               />
               <button
                 type="button"
                 onClick={() => handleCopyPixCode(payment.qrCode!)}
-                className="mt-2 w-full bg-transparent border border-[#12233D] text-[#12233D] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#12233D] hover:text-white transition-colors duration-150"
+                className="mt-2 w-full bg-transparent border border-[#0A0A0A] text-[#0A0A0A] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#0A0A0A] hover:text-white transition-colors duration-150"
               >
                 {copied ? "Código copiado!" : "Copiar código PIX"}
               </button>
@@ -353,7 +368,7 @@ export default function PaymentPage() {
             <a href={payment.ticketUrl ?? payment.paymentUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-sm text-[#3E6990] font-medium underline"
+              className="text-sm text-[#3A3A3A] font-medium underline"
             >
               Abrir página de pagamento
             </a>
@@ -366,7 +381,7 @@ export default function PaymentPage() {
 
             if (isApproved) {
               return (
-                <p className="text-sm text-[#2F6E48] bg-[#3F8F5F]/10 rounded-md px-3 py-2.5">
+                <p className="text-sm text-[#1F8A5B] bg-[#26A06D]/10 rounded-md px-3 py-2.5">
                   Pagamento confirmado com o saldo da sua carteira.
                 </p>
               );
@@ -374,11 +389,11 @@ export default function PaymentPage() {
 
             return (
               <div>
-                <p className="text-sm text-[#586268] mb-2">
+                <p className="text-sm text-[#3A3A3A] mb-2">
                   Não consegui identificar QR code ou link de pagamento na
                   resposta da API. Confira o JSON abaixo com o time de backend.
                 </p>
-                <pre className="text-xs text-[#586268] bg-[#F1F4F2] rounded-md p-3 overflow-x-auto">
+                <pre className="text-xs text-[#3A3A3A] bg-[#F5F2EC] rounded-md p-3 overflow-x-auto">
                   {JSON.stringify(payment, null, 2)}
                 </pre>
               </div>
@@ -390,7 +405,7 @@ export default function PaymentPage() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed self-start"
+            className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed self-start"
           >
             {refreshing ? "Verificando..." : "Verificar status do pagamento"}
           </button>
@@ -404,7 +419,7 @@ export default function PaymentPage() {
 
             if (disputeOpened) {
               return (
-                <p className="text-sm text-[#C97F1E] bg-[#E8A33D]/10 rounded-md px-3 py-2.5">
+                <p className="text-sm text-[#C99A00] bg-[#F5C518]/10 rounded-md px-3 py-2.5">
                   Disputa aberta. Nossa equipe vai analisar o caso e entrar em
                   contato.
                 </p>
@@ -426,16 +441,16 @@ export default function PaymentPage() {
             return (
               <form
                 onSubmit={handleOpenDispute}
-                className="flex flex-col gap-2.5 pt-3 border-t border-[#F1F4F2]"
+                className="flex flex-col gap-2.5 pt-3 border-t border-[#F5F2EC]"
               >
-                <label className="text-xs font-medium text-[#12233D]">
+                <label className="text-xs font-medium text-[#0A0A0A]">
                   Descreva o que aconteceu
                 </label>
                 <textarea
                   value={disputeReason}
                   onChange={(event) => setDisputeReason(event.target.value)}
                   rows={3}
-                  className="w-full border border-[#C7D1CB] rounded-md px-3 py-2 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+                  className="w-full border border-[#D9D6D0] rounded-md px-3 py-2 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
                   placeholder="Ex: Serviço não foi concluído, cobrança indevida..."
                 />
 
@@ -458,7 +473,7 @@ export default function PaymentPage() {
                       setDisputeReason("");
                       setDisputeError(null);
                     }}
-                    className="flex-1 bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150"
+                    className="flex-1 bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
                   >
                     Voltar
                   </button>

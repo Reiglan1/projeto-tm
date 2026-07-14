@@ -11,6 +11,7 @@ import { ResponseServiceOrderJason } from "@/types/serviceOrder";
 import { ResponseReviewJason } from "@/types/review";
 import { ApiError } from "@/services/apiError";
 import { buildPaymentPath, buildChatPath } from "@/constants/Constants";
+import { getUnreadCounts } from "@/services/chat";
 import { SERVICE_ORDER_STATUS } from "@/constants/ServiceOrderStatus";
 import Modal from "@/components/Modal/Modal";
 import StarRating from "@/components/StarRating/StarRating";
@@ -26,18 +27,18 @@ interface StatusMeta {
 function getOrderStatusMeta(status: string): StatusMeta {
   switch (status.toUpperCase()) {
     case SERVICE_ORDER_STATUS.COMPLETED:
-      return { label: "Concluído", dotClass: "bg-[#3F8F5F]", textClass: "text-[#2F6E48]" };
+      return { label: "Concluído", dotClass: "bg-[#26A06D]", textClass: "text-[#1F8A5B]" };
     case SERVICE_ORDER_STATUS.IN_PROGRESS:
-      return { label: "Em andamento", dotClass: "bg-[#3E6990]", textClass: "text-[#3E6990]" };
+      return { label: "Em andamento", dotClass: "bg-[#F5C518]", textClass: "text-[#3A3A3A]" };
     case SERVICE_ORDER_STATUS.ACCEPTED:
-      return { label: "Aceito", dotClass: "bg-[#3E6990]", textClass: "text-[#3E6990]" };
+      return { label: "Aceito", dotClass: "bg-[#F5C518]", textClass: "text-[#3A3A3A]" };
     case SERVICE_ORDER_STATUS.CANCELLED:
-      return { label: "Cancelado", dotClass: "bg-[#B4402A]", textClass: "text-[#B4402A]" };
+      return { label: "Cancelado", dotClass: "bg-[#E63946]", textClass: "text-[#E63946]" };
     case SERVICE_ORDER_STATUS.DISPUTED:
-      return { label: "Em disputa", dotClass: "bg-[#B4402A]", textClass: "text-[#B4402A]" };
+      return { label: "Em disputa", dotClass: "bg-[#E63946]", textClass: "text-[#E63946]" };
     case SERVICE_ORDER_STATUS.PENDING:
     default:
-      return { label: status || "Pendente", dotClass: "bg-[#C97F1E]", textClass: "text-[#C97F1E]" };
+      return { label: status || "Pendente", dotClass: "bg-[#C99A00]", textClass: "text-[#C99A00]" };
   }
 }
 
@@ -85,6 +86,7 @@ function OrderCard({
   showPayButton,
   isWorker,
   currentUserId,
+  unreadCount,
   onUpdated,
 }: {
   order: ResponseServiceOrderJason;
@@ -93,6 +95,7 @@ function OrderCard({
   showPayButton: boolean;
   isWorker: boolean;
   currentUserId?: string;
+  unreadCount?: number;
   onUpdated: (updated: ResponseServiceOrderJason) => void;
 }) {
   const navigate = useNavigate();
@@ -216,13 +219,13 @@ function OrderCard({
   }
 
   return (
-    <div className="bg-white border border-[#C7D1CB] rounded-xl p-5 flex flex-col gap-3">
+    <div className="bg-white border border-[#D9D6D0] rounded-xl p-5 flex flex-col gap-3">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[15px] font-semibold text-[#12233D]">
+          <p className="text-[15px] font-semibold text-[#0A0A0A]">
             {order.categoryName}
           </p>
-          <p className="text-xs text-[#586268] mt-0.5">
+          <p className="text-xs text-[#3A3A3A] mt-0.5">
             {counterpartLabel}: {counterpartName}
           </p>
         </div>
@@ -232,25 +235,25 @@ function OrderCard({
         </span>
       </div>
 
-      <p className="text-sm text-[#586268]">{order.description}</p>
+      <p className="text-sm text-[#3A3A3A]">{order.description}</p>
 
-      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#F1F4F2] text-sm">
+      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#F5F2EC] text-sm">
         <div>
-          <p className="text-xs text-[#586268]">Data</p>
-          <p className="text-[#12233D] font-medium">{formatDateTime(order.scheduledAt)}</p>
+          <p className="text-xs text-[#3A3A3A]">Data</p>
+          <p className="text-[#0A0A0A] font-medium">{formatDateTime(order.scheduledAt)}</p>
         </div>
         <div>
-          <p className="text-xs text-[#586268]">Valor</p>
-          <p className="text-[#12233D] font-medium">{formatCurrency(order.value)}</p>
+          <p className="text-xs text-[#3A3A3A]">Valor</p>
+          <p className="text-[#0A0A0A] font-medium">{formatCurrency(order.value)}</p>
         </div>
         <div className="col-span-2">
-          <p className="text-xs text-[#586268]">Endereço</p>
-          <p className="text-[#12233D] font-medium truncate">{order.address}</p>
+          <p className="text-xs text-[#3A3A3A]">Endereço</p>
+          <p className="text-[#0A0A0A] font-medium truncate">{order.address}</p>
         </div>
       </div>
 
       {isCancelled && order.cancellationReason && (
-        <p className="text-xs text-[#B4402A] bg-red-50 rounded-md px-3 py-2">
+        <p className="text-xs text-[#E63946] bg-red-50 rounded-md px-3 py-2">
           Motivo do cancelamento: {order.cancellationReason}
         </p>
       )}
@@ -258,9 +261,9 @@ function OrderCard({
       {isCompleted && currentUserId && (
         <div className="pt-1">
           {myReview ? (
-            <div className="flex items-center gap-2 bg-[#F1F4F2] rounded-md px-3 py-2">
+            <div className="flex items-center gap-2 bg-[#F5F2EC] rounded-md px-3 py-2">
               <StarRating value={myReview.rating} readOnly />
-              <span className="text-xs text-[#586268]">
+              <span className="text-xs text-[#3A3A3A]">
                 Você avaliou {counterpartLabel.toLowerCase()}
               </span>
             </div>
@@ -268,7 +271,7 @@ function OrderCard({
             <button
               onClick={() => setShowReviewModal(true)}
               disabled={checkingReview}
-              className="w-full bg-transparent border border-[#C97F1E] text-[#C97F1E] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#FDF4E8] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full bg-transparent border border-[#C99A00] text-[#C99A00] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#FFF6D6] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {checkingReview ? "Verificando..." : `Avaliar ${counterpartLabel.toLowerCase()}`}
             </button>
@@ -287,13 +290,13 @@ function OrderCard({
         <form onSubmit={handleSubmitReview} className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-2 py-2">
             <StarRating value={rating} onChange={setRating} />
-            <p className="text-xs text-[#586268]">
+            <p className="text-xs text-[#3A3A3A]">
               {rating > 0 ? `${rating} de 5 estrelas` : "Toque para avaliar"}
             </p>
           </div>
 
           <div>
-            <label className="text-xs font-medium text-[#12233D]">
+            <label className="text-xs font-medium text-[#0A0A0A]">
               Comentário (opcional)
             </label>
             <textarea
@@ -301,7 +304,7 @@ function OrderCard({
               onChange={(event) => setComment(event.target.value)}
               rows={3}
               maxLength={500}
-              className="mt-1.5 w-full border border-[#C7D1CB] rounded-md px-3 py-2 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+              className="mt-1.5 w-full border border-[#D9D6D0] rounded-md px-3 py-2 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
               placeholder="Conte como foi sua experiência..."
             />
           </div>
@@ -311,7 +314,7 @@ function OrderCard({
           <button
             type="submit"
             disabled={submittingReview}
-            className="w-full bg-[#12233D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-[#0A0A0A] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submittingReview ? "Enviando..." : "Enviar avaliação"}
           </button>
@@ -321,19 +324,24 @@ function OrderCard({
       {!isCancelled && (
         <button
           onClick={() => navigate(buildChatPath(order.id))}
-          className="w-full bg-transparent border border-[#12233D] text-[#12233D] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#12233D] hover:text-white transition-colors duration-150 flex items-center justify-center gap-2"
+          className="w-full relative bg-transparent border border-[#0A0A0A] text-[#0A0A0A] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#0A0A0A] hover:text-white transition-colors duration-150 flex items-center justify-center gap-2"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
           </svg>
           Conversar
+          {Boolean(unreadCount) && (
+            <span className="absolute -top-2 -right-2 min-w-[20px] h-5 px-1.5 rounded-full bg-[#E63946] text-white text-[11px] font-semibold flex items-center justify-center">
+              {unreadCount! > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </button>
       )}
 
       {showPayButton && !isCancelled && (
         <button
           onClick={() => navigate(buildPaymentPath(order.id))}
-          className="w-full bg-[#12233D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150"
+          className="w-full bg-[#0A0A0A] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150"
         >
           Pagar
         </button>
@@ -344,7 +352,7 @@ function OrderCard({
           <button
             onClick={handleAdvanceStatus}
             disabled={updatingStatus}
-            className="w-full bg-[#3F8F5F] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#2F6E48] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="w-full bg-[#26A06D] border-none text-white px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1F8A5B] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {updatingStatus ? "Atualizando..." : nextAction.label}
           </button>
@@ -362,11 +370,11 @@ function OrderCard({
       )}
 
       {canCancel && confirmingCancel && (
-        <form onSubmit={handleConfirmCancel} className="flex flex-col gap-2.5 pt-2 border-t border-[#F1F4F2]">
-          <label className="text-xs font-medium text-[#12233D]">
+        <form onSubmit={handleConfirmCancel} className="flex flex-col gap-2.5 pt-2 border-t border-[#F5F2EC]">
+          <label className="text-xs font-medium text-[#0A0A0A]">
             Motivo do cancelamento (opcional)
           </label>
-          <p className="text-xs text-[#586268]">
+          <p className="text-xs text-[#3A3A3A]">
             Se o chamado já estiver pago, o valor é estornado automaticamente
             após o cancelamento.
           </p>
@@ -374,7 +382,7 @@ function OrderCard({
             value={reason}
             onChange={(event) => setReason(event.target.value)}
             rows={2}
-            className="w-full border border-[#C7D1CB] rounded-md px-3 py-2 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+            className="w-full border border-[#D9D6D0] rounded-md px-3 py-2 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
             placeholder="Ex: Imprevisto, remarquei para outra data..."
           />
 
@@ -395,7 +403,7 @@ function OrderCard({
                 setReason("");
                 setCancelError(null);
               }}
-              className="flex-1 bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150"
+              className="flex-1 bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
             >
               Voltar
             </button>
@@ -415,6 +423,23 @@ export default function MyServiceOrdersPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [unreadByOrder, setUnreadByOrder] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!user) return;
+
+    getUnreadCounts()
+      .then((data) => {
+        const map: Record<string, number> = {};
+        (data.perOrder ?? []).forEach((entry) => {
+          map[entry.serviceOrderId] = entry.count;
+        });
+        setUnreadByOrder(map);
+      })
+      .catch(() => {
+        // Badge é só um detalhe visual, não bloqueia a tela se falhar.
+      });
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -462,20 +487,20 @@ export default function MyServiceOrdersPage() {
   return (
     <div className="max-w-[880px] mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#12233D]">Meus chamados</h1>
+        <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Meus chamados</h1>
         {!loading && !error && (
-          <p className="text-sm text-[#586268]">{totalCount} encontrados</p>
+          <p className="text-sm text-[#3A3A3A]">{totalCount} encontrados</p>
         )}
       </div>
 
       {loading && (
-        <p className="text-sm text-[#586268]">Carregando chamados...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando chamados...</p>
       )}
 
       {!loading && error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && orders.length === 0 && (
-        <p className="text-sm text-[#586268]">
+        <p className="text-sm text-[#3A3A3A]">
           Você ainda não tem nenhum chamado.
         </p>
       )}
@@ -494,6 +519,7 @@ export default function MyServiceOrdersPage() {
                 showPayButton={user?.role === "client"}
                 isWorker={user?.role === "worker"}
                 currentUserId={user?.id}
+                unreadCount={unreadByOrder[order.id]}
                 onUpdated={handleOrderUpdated}
               />
             ))}
@@ -504,11 +530,11 @@ export default function MyServiceOrdersPage() {
               <button
                 onClick={() => setPage((current) => Math.max(1, current - 1))}
                 disabled={page <= 1}
-                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Anterior
               </button>
-              <span className="text-sm text-[#586268]">
+              <span className="text-sm text-[#3A3A3A]">
                 Página {page} de {totalPages}
               </span>
               <button
@@ -516,7 +542,7 @@ export default function MyServiceOrdersPage() {
                   setPage((current) => Math.min(totalPages, current + 1))
                 }
                 disabled={page >= totalPages}
-                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-4 py-2 rounded-md text-sm font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Próxima
               </button>

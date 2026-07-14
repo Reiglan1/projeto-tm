@@ -40,12 +40,12 @@ function FileField({ label, hint, file, onChange }: FileFieldProps) {
 
   return (
     <div>
-      <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+      <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
         {label}
       </label>
       <div
         onClick={() => inputRef.current?.click()}
-        className="border border-dashed border-[#C7D1CB] rounded-lg p-4 flex items-center gap-4 cursor-pointer hover:border-[#12233D] transition-colors duration-150"
+        className="border border-dashed border-[#D9D6D0] rounded-lg p-4 flex items-center gap-4 cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
       >
         {preview ? (
           <img
@@ -54,17 +54,17 @@ function FileField({ label, hint, file, onChange }: FileFieldProps) {
             className="w-16 h-16 rounded-md object-cover shrink-0"
           />
         ) : (
-          <div className="w-16 h-16 rounded-md bg-[#F1F4F2] flex items-center justify-center shrink-0 text-[#586268]">
+          <div className="w-16 h-16 rounded-md bg-[#F5F2EC] flex items-center justify-center shrink-0 text-[#3A3A3A]">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 5v14M5 12h14" />
             </svg>
           </div>
         )}
         <div className="min-w-0">
-          <p className="text-sm font-medium text-[#12233D] truncate">
+          <p className="text-sm font-medium text-[#0A0A0A] truncate">
             {file ? file.name : "Toque para selecionar uma foto"}
           </p>
-          <p className="text-xs text-[#586268] mt-0.5">{hint}</p>
+          <p className="text-xs text-[#3A3A3A] mt-0.5">{hint}</p>
         </div>
       </div>
       <input
@@ -82,12 +82,12 @@ function statusLabel(record: VerificationRecord): { label: string; className: st
   const raw = (record.decision ?? record.status ?? "").toString().toUpperCase();
 
   if (raw === "APPROVED" || raw === "VERIFIED") {
-    return { label: "Verificação aprovada", className: "bg-[#3F8F5F]/10 text-[#2F6E48]" };
+    return { label: "Verificação aprovada", className: "bg-[#26A06D]/10 text-[#1F8A5B]" };
   }
   if (raw === "REJECTED" || raw === "DENIED") {
     return { label: "Verificação recusada", className: "bg-red-50 text-red-600" };
   }
-  return { label: "Em análise", className: "bg-[#E8A33D]/15 text-[#C97F1E]" };
+  return { label: "Em análise", className: "bg-[#F5C518]/15 text-[#C99A00]" };
 }
 
 export default function VerificationPage() {
@@ -179,7 +179,7 @@ export default function VerificationPage() {
   if (loading) {
     return (
       <div className="max-w-xl mx-auto px-6 py-10">
-        <p className="text-sm text-[#586268]">Verificando seu status...</p>
+        <p className="text-sm text-[#3A3A3A]">Verificando seu status...</p>
       </div>
     );
   }
@@ -187,34 +187,34 @@ export default function VerificationPage() {
   return (
     <div className="max-w-xl mx-auto px-6 py-10 flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#12233D]">
+        <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Verificação de identidade
         </h1>
-        <p className="text-sm text-[#586268] mt-1">
+        <p className="text-sm text-[#3A3A3A] mt-1">
           Envie os documentos abaixo pra confirmar sua identidade na plataforma.
         </p>
       </div>
 
       {loadError && (
-        <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
+        <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
           <p className="text-sm text-red-600">{loadError}</p>
         </div>
       )}
 
       {!loadError && record && (
-        <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
+        <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
           <span
             className={`inline-block text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full mb-3 ${statusLabel(record).className}`}
           >
             {statusLabel(record).label}
           </span>
-          <p className="text-sm text-[#586268]">
+          <p className="text-sm text-[#3A3A3A]">
             Você já enviou seus documentos. Assim que a análise for concluída,
             o status aqui é atualizado.
           </p>
           {typeof record.reason === "string" && record.reason && (
-            <p className="text-sm text-[#586268] mt-2">
-              <strong className="text-[#12233D]">Observação:</strong> {record.reason}
+            <p className="text-sm text-[#3A3A3A] mt-2">
+              <strong className="text-[#0A0A0A]">Observação:</strong> {record.reason}
             </p>
           )}
         </div>
@@ -224,7 +224,7 @@ export default function VerificationPage() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex flex-col gap-5"
+          className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex flex-col gap-5"
         >
           <FileField
             label="Frente do documento"
@@ -247,7 +247,7 @@ export default function VerificationPage() {
 
           {formError && <p className="text-sm text-red-600">{formError}</p>}
           {submitSuccess && (
-            <p className="text-sm text-[#2F6E48]">
+            <p className="text-sm text-[#1F8A5B]">
               Documentos enviados! Vamos avisar quando a análise terminar.
             </p>
           )}
@@ -255,7 +255,7 @@ export default function VerificationPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {submitting ? "Enviando..." : "Enviar documentos"}
           </button>

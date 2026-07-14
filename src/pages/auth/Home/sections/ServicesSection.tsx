@@ -1,4 +1,6 @@
+import { useReveal } from "@/hooks/useReveal";
 export default function ServicesSection() {
+  const scopeRef = useReveal<HTMLElement>();
     const services = [
         {
             icon: (
@@ -63,47 +65,47 @@ export default function ServicesSection() {
     ];
 
     return (
-        <section className="bg-[#E9EDE9] border-t border-[#C7D1CB] px-6 py-14 sm:px-10 sm:py-20">
+        <section ref={scopeRef} className="bg-[#E9EDE9] border-t border-[#D9D6D0] px-6 py-14 sm:px-10 sm:py-20">
 
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-center items-center sm:items-end gap-5 sm:gap-0 mb-11">
                 <div>
-                    <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#3E6990] mb-3">
-                        <span className="w-[18px] h-px bg-[#3E6990]" />
+                    <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#3A3A3A] mb-3">
+                        <span className="w-[18px] h-px bg-[#F5C518]" />
                         Categorias
                     </p>
-                    <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-[#12233D]">
+                    <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
                         Qualquer serviço,<br />um único lugar.
                     </h2>
                 </div>
             </div>
             <div className="flex flex-col sm:flex-row justify-end items-start sm:items-end gap-5 sm:gap-0 mb-11">
-                <button className="bg-transparent border-none text-[#3E6990] text-sm font-mono font-semibold cursor-pointer hover:underline">
+                <button className="bg-transparent border-none text-[#3A3A3A] text-sm font-mono font-semibold cursor-pointer hover:underline">
                     Ver todos →
                 </button>
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div data-reveal className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 {services.map((service) => (
                     <div
                         key={service.title}
-                        className="relative bg-white border border-[#C7D1CB] rounded-md px-6 py-7 cursor-pointer transition-all duration-150 hover:-translate-y-1 hover:shadow-[0_16px_32px_-20px_rgba(18,35,61,0.3)]"
+                        className="relative bg-white border border-[#D9D6D0] rounded-md px-6 py-7 cursor-pointer transition-all duration-150 hover:-translate-y-1 hover:shadow-[0_16px_32px_-20px_rgba(18,35,61,0.3)]"
                     >
                         {/* Furo de etiqueta */}
-                        <span className="absolute -top-2 left-6 w-4 h-4 rounded-full bg-[#E9EDE9] border border-[#C7D1CB]" />
-                        <span className="absolute -top-[6px] left-[26px] w-2 h-2 rounded-full bg-[#F4F6F4]" />
+                        <span className="absolute -top-2 left-6 w-4 h-4 rounded-full bg-[#E9EDE9] border border-[#D9D6D0]" />
+                        <span className="absolute -top-[6px] left-[26px] w-2 h-2 rounded-full bg-[#FAF7F1]" />
 
-                        <div className="w-[38px] h-[38px] mb-4 text-[#1B3350]">
+                        <div className="w-[38px] h-[38px] mb-4 text-[#242424]">
                             {service.icon}
                         </div>
-                        <h4 className="text-[15px] font-semibold text-[#12233D] mb-1.5">
+                        <h4 className="text-[15px] font-semibold text-[#0A0A0A] mb-1.5">
                             {service.title}
                         </h4>
-                        <p className="text-xs text-[#586268] leading-relaxed mb-3.5">
+                        <p className="text-xs text-[#3A3A3A] leading-relaxed mb-3.5">
                             {service.description}
                         </p>
-                        <p className="text-[11px] font-mono font-semibold text-[#5C8368]">
+                        <p className="text-[11px] font-mono font-semibold text-[#C99A00]">
                             {service.count}
                         </p>
                     </div>

@@ -55,7 +55,7 @@ export default function CategoryPicker({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#586268] pointer-events-none"
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3A3A3A] pointer-events-none"
         >
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
@@ -70,18 +70,18 @@ export default function CategoryPicker({
           onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder={placeholder}
-          className={`w-full border rounded-md pl-9 pr-3 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${
-            hasError ? "border-red-400" : "border-[#C7D1CB]"
+          className={`w-full border rounded-md pl-9 pr-3 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${
+            hasError ? "border-red-400" : "border-[#D9D6D0]"
           }`}
         />
 
         {open && (
-          <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-[#C7D1CB] rounded-md shadow-lg">
+          <div className="absolute z-10 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-[#D9D6D0] rounded-md shadow-lg">
             {loading && (
-              <p className="px-3 py-2 text-sm text-[#586268]">Carregando...</p>
+              <p className="px-3 py-2 text-sm text-[#3A3A3A]">Carregando...</p>
             )}
             {!loading && filteredOptions.length === 0 && (
-              <p className="px-3 py-2 text-sm text-[#586268]">
+              <p className="px-3 py-2 text-sm text-[#3A3A3A]">
                 Nenhuma categoria encontrada.
               </p>
             )}
@@ -92,7 +92,7 @@ export default function CategoryPicker({
                   type="button"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => selectCategory(category.id)}
-                  className="w-full text-left px-3 py-2 text-sm text-[#12233D] bg-transparent border-none cursor-pointer hover:bg-[#F1F4F2]"
+                  className="w-full text-left px-3 py-2 text-sm text-[#0A0A0A] bg-transparent border-none cursor-pointer hover:bg-[#F5F2EC]"
                 >
                   {category.name}
                 </button>
@@ -106,14 +106,14 @@ export default function CategoryPicker({
           {selectedCategories.map((category) => (
             <span
               key={category.id}
-              className="flex items-center gap-1.5 bg-[#12233D]/5 text-[#12233D] text-sm font-medium px-3 py-1.5 rounded-full"
+              className="flex items-center gap-1.5 bg-[#0A0A0A]/5 text-[#0A0A0A] text-sm font-medium px-3 py-1.5 rounded-full"
             >
               {category.name}
               <button
                 type="button"
                 onClick={() => removeCategory(category.id)}
                 aria-label={`Remover ${category.name}`}
-                className="text-[#586268] hover:text-[#12233D] bg-transparent border-none cursor-pointer leading-none text-base"
+                className="text-[#3A3A3A] hover:text-[#0A0A0A] bg-transparent border-none cursor-pointer leading-none text-base"
               >
                 &times;
               </button>

@@ -53,10 +53,10 @@ export default function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="max-w-md mx-auto px-6 py-16 text-center">
-        <h1 className="text-xl font-bold text-[#12233D] mb-2">
+        <h1 className="text-xl font-bold text-[#0A0A0A] mb-2 uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Link inválido
         </h1>
-        <p className="text-sm text-[#586268]">
+        <p className="text-sm text-[#3A3A3A]">
           Esse link de redefinição de senha é inválido ou já expirou. Solicite
           um novo pela tela de login.
         </p>
@@ -67,15 +67,15 @@ export default function ResetPasswordPage() {
   if (success) {
     return (
       <div className="max-w-md mx-auto px-6 py-16 text-center">
-        <h1 className="text-xl font-bold text-[#12233D] mb-2">
+        <h1 className="text-xl font-bold text-[#0A0A0A] mb-2 uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Senha redefinida!
         </h1>
-        <p className="text-sm text-[#586268] mb-6">
+        <p className="text-sm text-[#3A3A3A] mb-6">
           Sua senha foi alterada com sucesso. Já pode entrar com ela.
         </p>
         <button
           onClick={() => openLogin()}
-          className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150"
+          className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150"
         >
           Entrar agora
         </button>
@@ -85,20 +85,20 @@ export default function ResetPasswordPage() {
 
   return (
     <div className="max-w-md mx-auto px-6 py-16">
-      <h1 className="text-2xl font-bold text-[#12233D] mb-2">
+      <h1 className="text-2xl font-bold text-[#0A0A0A] mb-2 uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
         Criar nova senha
       </h1>
-      <p className="text-sm text-[#586268] mb-6">
+      <p className="text-sm text-[#3A3A3A] mb-6">
         Escolha uma nova senha para acessar sua conta.
       </p>
 
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex flex-col gap-4"
+        className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex flex-col gap-4"
       >
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             Nova senha
           </label>
           <input
@@ -106,7 +106,7 @@ export default function ResetPasswordPage() {
             value={newPassword}
             onFocus={() => setPasswordFocused(true)}
             onChange={(event) => setNewPassword(event.target.value)}
-            className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+            className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
             placeholder="••••••••"
           />
 
@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
                 <li
                   key={rule.label}
                   className={`text-xs flex items-center gap-1.5 ${
-                    rule.valid ? "text-green-600" : "text-[#586268]"
+                    rule.valid ? "text-green-600" : "text-[#3A3A3A]"
                   }`}
                 >
                   <span>{rule.valid ? "✓" : "•"}</span>
@@ -128,14 +128,14 @@ export default function ResetPasswordPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+          <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
             Confirmar nova senha
           </label>
           <input
             type="password"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
-            className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+            className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
             placeholder="••••••••"
           />
         </div>
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {submitting ? "Salvando..." : "Redefinir senha"}
         </button>

@@ -356,7 +356,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <p className="text-sm text-[#586268]">Carregando seu perfil...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando seu perfil...</p>
       </div>
     );
   }
@@ -374,19 +374,19 @@ export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-10 flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#12233D]">Meu perfil</h1>
-        <p className="text-sm text-[#586268] mt-1">
+        <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Meu perfil</h1>
+        <p className="text-sm text-[#3A3A3A] mt-1">
           Membro desde {formatDate(profile.createdAt)}
         </p>
       </div>
 
       {/* Verificação de identidade */}
-      <div className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex items-center justify-between gap-4 flex-wrap">
+      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-sm font-semibold text-[#12233D]">
+          <h2 className="text-sm font-semibold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
             Verificação de identidade
           </h2>
-          <p className="text-sm text-[#586268] mt-1">
+          <p className="text-sm text-[#3A3A3A] mt-1">
             {user?.role === "worker" && profile.verificationStatus
               ? "Confira o status ou envie seus documentos."
               : "Envie seus documentos para confirmar sua identidade."}
@@ -394,22 +394,22 @@ export default function ProfilePage() {
         </div>
         <button
           onClick={() => navigate(ROUTES.VERIFICATION)}
-          className="bg-transparent border border-[#12233D] text-[#12233D] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#12233D] hover:text-white transition-colors duration-150 shrink-0"
+          className="bg-transparent border border-[#0A0A0A] text-[#0A0A0A] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#0A0A0A] hover:text-white transition-colors duration-150 shrink-0"
         >
           Verificar identidade
         </button>
       </div>
 
       {/* Dados da conta */}
-      <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
+      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
         <div className="flex flex-wrap gap-2 mb-6">
-          <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F1F4F2] text-[#586268] px-2.5 py-1 rounded-full">
+          <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5F2EC] text-[#3A3A3A] px-2.5 py-1 rounded-full">
             {profile.status}
           </span>
           <span
             className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${profile.emailVerified
-              ? "bg-[#3F8F5F]/10 text-[#2F6E48]"
-              : "bg-[#E8A33D]/15 text-[#C97F1E]"
+              ? "bg-[#26A06D]/10 text-[#1F8A5B]"
+              : "bg-[#F5C518]/15 text-[#C99A00]"
               }`}
           >
             {profile.emailVerified ? "E-mail verificado" : "E-mail não verificado"}
@@ -418,18 +418,18 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => setShowVerificationModal(true)}
-              className="text-[11px] font-semibold uppercase tracking-wide text-[#3E6990] bg-transparent border-none cursor-pointer underline"
+              className="text-[11px] font-semibold uppercase tracking-wide text-[#3A3A3A] bg-transparent border-none cursor-pointer underline"
             >
               Verificar
             </button>
           )}
           {user?.role === "worker" && profile.verificationStatus && (
-            <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#3E6990]/10 text-[#3E6990] px-2.5 py-1 rounded-full">
+            <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5C518]/15 text-[#3A3A3A] px-2.5 py-1 rounded-full">
               {profile.verificationStatus}
             </span>
           )}
           {user?.role === "worker" && typeof profile.reviewCount === "number" && (
-            <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#E8A33D]/15 text-[#C97F1E] px-2.5 py-1 rounded-full">
+            <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5C518]/15 text-[#C99A00] px-2.5 py-1 rounded-full">
               ★ {(profile.averageRating ?? 0).toFixed(1)} ({profile.reviewCount})
             </span>
           )}
@@ -437,7 +437,7 @@ export default function ProfilePage() {
 
         <form onSubmit={handleSubmit} noValidate className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Nome completo
             </label>
             <input
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                 setName(event.target.value);
                 setFieldErrors((current) => ({ ...current, name: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.name ? "border-red-400" : "border-[#C7D1CB]"
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.name ? "border-red-400" : "border-[#D9D6D0]"
                 }`}
             />
             {fieldErrors.name && (
@@ -456,22 +456,22 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               E-mail
             </label>
             <input
               type="email"
               value={profile.email}
               disabled
-              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#586268] bg-[#F1F4F2] cursor-not-allowed"
+              className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#3A3A3A] bg-[#F5F2EC] cursor-not-allowed"
             />
-            <p className="text-xs text-[#586268] mt-1">
+            <p className="text-xs text-[#3A3A3A] mt-1">
               O e-mail não pode ser alterado por aqui.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Telefone
             </label>
             <input
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                 setPhone(maskPhone(event.target.value));
                 setFieldErrors((current) => ({ ...current, phone: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] ${fieldErrors.phone ? "border-red-400" : "border-[#C7D1CB]"
+              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.phone ? "border-red-400" : "border-[#D9D6D0]"
                 }`}
               placeholder="(00) 00000-0000"
             />
@@ -492,8 +492,8 @@ export default function ProfilePage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-              Chave Pix <span className="text-[#586268] font-normal">(obrigatório)</span>
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
+              Chave Pix <span className="text-[#3A3A3A] font-normal">(obrigatório)</span>
             </label>
 
             {editingPixKey ? (
@@ -506,7 +506,7 @@ export default function ProfilePage() {
                       setPixKeyValue("");
                       setFieldErrors((current) => ({ ...current, pixKey: undefined }));
                     }}
-                    className="w-36 shrink-0 border border-[#C7D1CB] rounded-md px-3 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] bg-white"
+                    className="w-36 shrink-0 border border-[#D9D6D0] rounded-md px-3 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] bg-white"
                   >
                     <option value="">Tipo</option>
                     {PIX_KEY_TYPE_OPTIONS.map((option) => (
@@ -526,7 +526,7 @@ export default function ProfilePage() {
                     placeholder={
                       pixKeyType ? "Digite sua chave Pix" : "Escolha o tipo primeiro"
                     }
-                    className={`flex-1 min-w-0 border rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] disabled:bg-[#F1F4F2] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#C7D1CB]"
+                    className={`flex-1 min-w-0 border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] disabled:bg-[#F5F2EC] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#D9D6D0]"
                       }`}
                   />
                 </div>
@@ -541,18 +541,18 @@ export default function ProfilePage() {
                     setPixKeyValue("");
                     setFieldErrors((current) => ({ ...current, pixKey: undefined }));
                   }}
-                  className="text-xs text-[#586268] font-medium underline bg-transparent border-none cursor-pointer self-start"
+                  className="text-xs text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer self-start"
                 >
                   Cancelar
                 </button>
               </div>
             ) : profile.pixKeyType ? (
-              <div className="flex items-center justify-between gap-3 border border-[#C7D1CB] rounded-md px-3.5 py-2.5">
+              <div className="flex items-center justify-between gap-3 border border-[#D9D6D0] rounded-md px-3.5 py-2.5">
                 <div>
-                  <p className="text-sm font-medium text-[#12233D]">
+                  <p className="text-sm font-medium text-[#0A0A0A]">
                     {pixKeyTypeLabel(profile.pixKeyType)}
                   </p>
-                  <p className="text-xs text-[#586268]">
+                  <p className="text-xs text-[#3A3A3A]">
                     {maskPixKeyDisplay(profile.pixKey)}
                   </p>
                 </div>
@@ -563,7 +563,7 @@ export default function ProfilePage() {
                     setPixKeyType(profile.pixKeyType ?? "");
                     setPixKeyValue("");
                   }}
-                  className="text-xs text-[#3E6990] font-medium underline bg-transparent border-none cursor-pointer shrink-0"
+                  className="text-xs text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer shrink-0"
                 >
                   Trocar
                 </button>
@@ -576,14 +576,14 @@ export default function ProfilePage() {
                   setPixKeyType("");
                   setPixKeyValue("");
                 }}
-                className="text-sm text-[#3E6990] font-medium underline bg-transparent border-none cursor-pointer"
+                className="text-sm text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer"
               >
                 + Adicionar chave Pix
               </button>
             )}
 
             {!editingPixKey && (
-              <p className="text-xs text-[#586268] mt-1.5">
+              <p className="text-xs text-[#3A3A3A] mt-1.5">
                 {profile.pixKeyType
                   ? "Usada para receber seus repasses/saques via Pix. Não é possível remover, só trocar por outra."
                   : "Usada para receber seus repasses/saques via Pix."}
@@ -593,7 +593,7 @@ export default function ProfilePage() {
 
           {user?.role === "worker" && (
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
                 Categorias de serviço
               </label>
               <CategoryPicker
@@ -611,21 +611,21 @@ export default function ProfilePage() {
 
           {user?.role === "worker" && (
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
-                Sobre você <span className="text-[#586268] font-normal">(opcional)</span>
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
+                Sobre você <span className="text-[#3A3A3A] font-normal">(opcional)</span>
               </label>
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 rows={3}
-                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D] resize-none"
+                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
                 placeholder="Conte um pouco da sua experiência para os clientes"
               />
             </div>
           )}
 
           {user?.role === "worker" && (
-            <label className="flex items-center gap-2 text-sm text-[#586268]">
+            <label className="flex items-center gap-2 text-sm text-[#3A3A3A]">
               <input
                 type="checkbox"
                 checked={available24Hours}
@@ -637,13 +637,13 @@ export default function ProfilePage() {
 
           {saveError && <p className="text-sm text-red-600">{saveError}</p>}
           {saveSuccess && (
-            <p className="text-sm text-[#2F6E48]">Alterações salvas com sucesso.</p>
+            <p className="text-sm text-[#1F8A5B]">Alterações salvas com sucesso.</p>
           )}
 
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {saving ? "Salvando..." : "Salvar alterações"}
           </button>
@@ -654,10 +654,10 @@ export default function ProfilePage() {
 
       {/* Zona de risco */}
       <div className="bg-white border border-red-200 rounded-xl p-6">
-        <h2 className="text-sm font-semibold text-red-600 mb-1.5">
+        <h2 className="text-sm font-semibold text-red-600 mb-1.5 uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Excluir conta
         </h2>
-        <p className="text-sm text-[#586268] mb-4">
+        <p className="text-sm text-[#3A3A3A] mb-4">
           Essa ação é permanente e não pode ser desfeita.
         </p>
 
@@ -671,7 +671,7 @@ export default function ProfilePage() {
         ) : (
           <form onSubmit={handleDelete} noValidate className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
                 Confirme sua senha
               </label>
               <input
@@ -681,7 +681,7 @@ export default function ProfilePage() {
                   setDeletePassword(event.target.value);
                   setDeleteError(null);
                 }}
-                className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
                 placeholder="••••••••"
               />
             </div>
@@ -703,7 +703,7 @@ export default function ProfilePage() {
                   setDeletePassword("");
                   setDeleteError(null);
                 }}
-                className="bg-transparent border border-[#C7D1CB] text-[#12233D] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#12233D] transition-colors duration-150"
+                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
               >
                 Cancelar
               </button>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import FaleConosco from "./FaleConosco";
+import { useReveal } from "@/hooks/useReveal";
 
 const faqs = [
     {
@@ -37,6 +38,7 @@ const faqs = [
 ];
 
 export default function FAQSection() {
+    const scopeRef = useReveal<HTMLElement>();
     const [openIndex, setOpenIndex] = useState<number | null>(null);
 
     function toggle(index: number) {
@@ -44,43 +46,43 @@ export default function FAQSection() {
     }
 
     return (
-        <section className="bg-white border-t border-[#C7D1CB] px-6 py-14 sm:px-10 sm:py-20 flex flex-col sm:flex-row gap-12 sm:gap-0">
+        <section ref={scopeRef} className="bg-white border-t border-[#D9D6D0] px-6 py-14 sm:px-10 sm:py-20 flex flex-col sm:flex-row gap-12 sm:gap-0">
             <div className="w-full">
 
                 {/* Header */}
-                <div className="text-center mb-14">
-                    <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#3E6990] mb-4">
-                        <span className="w-[18px] h-px bg-[#3E6990]" />
+                <div data-reveal className="text-center mb-14">
+                    <p className="flex items-center justify-center gap-2 text-[11px] font-mono font-semibold tracking-[2px] uppercase text-[#3A3A3A] mb-4">
+                        <span className="w-[18px] h-px bg-[#F5C518]" />
                         FAQ
                     </p>
-                    <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-[#12233D]">
+                    <h2 className="text-[30px] sm:text-[44px] font-bold leading-none tracking-[-1px] sm:tracking-[-2px] text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
                         Perguntas frequentes.
                     </h2>
                 </div>
 
                 {/* Lista */}
-                <div className="max-w-[680px] mx-auto">
+                <div data-reveal className="max-w-[680px] mx-auto">
                     {faqs.map((faq, index) => {
                         const isOpen = openIndex === index;
                         return (
                             <div
                                 key={index}
-                                className={`border-t border-[#C7D1CB] ${index === faqs.length - 1 ? "border-b" : ""}`}
+                                className={`border-t border-[#D9D6D0] ${index === faqs.length - 1 ? "border-b" : ""}`}
                             >
                                 <button
                                     onClick={() => toggle(index)}
                                     className="w-full bg-transparent border-none py-[22px] flex justify-between items-center cursor-pointer gap-4 text-left"
                                 >
                                     <span
-                                        className={`text-[15px] font-semibold transition-colors duration-200 ${isOpen ? "text-[#3E6990]" : "text-[#12233D]"
+                                        className={`text-[15px] font-semibold transition-colors duration-200 ${isOpen ? "text-[#3A3A3A]" : "text-[#0A0A0A]"
                                             }`}
                                     >
                                         {faq.question}
                                     </span>
                                     <div
                                         className={`w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0 text-lg font-mono font-light leading-none transition-all duration-300 ${isOpen
-                                            ? "bg-[#3E6990] text-white rotate-45"
-                                            : "bg-[#F4F6F4] border border-[#C7D1CB] text-[#3E6990]"
+                                            ? "bg-[#F5C518] text-[#0A0A0A] rotate-45"
+                                            : "bg-[#FAF7F1] border border-[#D9D6D0] text-[#3A3A3A]"
                                             }`}
                                     >
                                         +
@@ -93,7 +95,7 @@ export default function FAQSection() {
                                         }`}
                                     style={{ transition: "max-height 0.35s ease, opacity 0.3s ease" }}
                                 >
-                                    <p className="text-sm text-[#586268] leading-[1.7] pb-[22px]">
+                                    <p className="text-sm text-[#3A3A3A] leading-[1.7] pb-[22px]">
                                         {faq.answer}
                                     </p>
                                 </div>

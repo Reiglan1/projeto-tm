@@ -63,7 +63,7 @@ export default function ClientProfilePage() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-10">
-        <p className="text-sm text-[#586268]">Carregando cliente...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando cliente...</p>
       </div>
     );
   }
@@ -83,25 +83,25 @@ export default function ClientProfilePage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-10 flex flex-col gap-6">
       {/* Cabeçalho */}
-      <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
+      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
         <div className="flex items-start gap-4 flex-wrap">
-          <span className="w-20 h-20 rounded-full bg-[#12233D] text-white flex items-center justify-center text-2xl font-semibold shrink-0">
+          <span className="w-20 h-20 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center text-2xl font-semibold shrink-0">
             {getInitials(client.name)}
           </span>
 
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-bold text-[#12233D]">{client.name}</h1>
-            <p className="text-sm text-[#586268] mt-0.5">
+            <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>{client.name}</h1>
+            <p className="text-sm text-[#3A3A3A] mt-0.5">
               Na plataforma desde {formatDate(client.memberSince)}
             </p>
 
             {hasReviews && (
               <div className="flex items-center gap-1.5 mt-2.5">
                 <StarRating value={Math.round(client.averageRating)} readOnly size="sm" />
-                <span className="text-sm font-medium text-[#12233D]">
+                <span className="text-sm font-medium text-[#0A0A0A]">
                   {client.averageRating.toFixed(1)}
                 </span>
-                <span className="text-sm text-[#586268]">
+                <span className="text-sm text-[#3A3A3A]">
                   ({client.reviewCount})
                 </span>
               </div>

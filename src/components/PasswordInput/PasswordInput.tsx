@@ -38,7 +38,7 @@ export default function PasswordInput({
         onClick={() => setVisible((current) => !current)}
         tabIndex={-1}
         aria-label={visible ? "Ocultar senha" : "Mostrar senha"}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#586268] hover:text-[#12233D] bg-transparent border-none cursor-pointer p-0 flex items-center transition-colors duration-150"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3A3A3A] hover:text-[#0A0A0A] bg-transparent border-none cursor-pointer p-0 flex items-center transition-colors duration-150"
       >
         {visible ? (
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

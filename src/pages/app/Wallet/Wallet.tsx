@@ -24,12 +24,12 @@ function withdrawalStatusLabel(record: WithdrawalRecord): { label: string; class
   const raw = (record.result ?? record.status ?? "").toString().toUpperCase();
 
   if (raw.includes("SUCCESS") || raw === "APPROVED" || raw === "COMPLETED") {
-    return { label: "Concluído", className: "bg-[#3F8F5F]/10 text-[#2F6E48]" };
+    return { label: "Concluído", className: "bg-[#26A06D]/10 text-[#1F8A5B]" };
   }
   if (raw.includes("FAIL") || raw === "REJECTED") {
     return { label: "Falhou", className: "bg-red-50 text-red-600" };
   }
-  return { label: raw || "Em processamento", className: "bg-[#E8A33D]/15 text-[#C97F1E]" };
+  return { label: raw || "Em processamento", className: "bg-[#F5C518]/15 text-[#C99A00]" };
 }
 
 export default function WalletPage() {
@@ -102,7 +102,7 @@ export default function WalletPage() {
   if (loading) {
     return (
       <div className="max-w-xl mx-auto px-6 py-10">
-        <p className="text-sm text-[#586268]">Carregando sua carteira...</p>
+        <p className="text-sm text-[#3A3A3A]">Carregando sua carteira...</p>
       </div>
     );
   }
@@ -127,14 +127,14 @@ export default function WalletPage() {
   return (
     <div className="max-w-xl mx-auto px-6 py-10 flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#12233D]">Carteira</h1>
-        <p className="text-sm text-[#586268] mt-1">
+        <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Carteira</h1>
+        <p className="text-sm text-[#3A3A3A] mt-1">
           Acompanhe seu saldo e solicite saques via PIX.
         </p>
       </div>
 
       {/* Saldo */}
-      <div className="bg-[#12233D] rounded-xl p-6 text-white">
+      <div className="bg-[#0A0A0A] rounded-xl p-6 text-white">
         {availableBalance !== null ? (
           <>
             <p className="text-sm text-white/60">Saldo disponível</p>
@@ -164,15 +164,15 @@ export default function WalletPage() {
       <form
         onSubmit={handleSubmit}
         noValidate
-        className="bg-white border border-[#C7D1CB] rounded-xl p-6 flex flex-col gap-4"
+        className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex flex-col gap-4"
       >
-        <h2 className="text-sm font-semibold text-[#12233D]">
+        <h2 className="text-sm font-semibold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Solicitar saque
         </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Valor (R$)
             </label>
             <input
@@ -181,19 +181,19 @@ export default function WalletPage() {
               step="0.01"
               value={amount}
               onChange={(event) => setAmount(event.target.value)}
-              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+              className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
               placeholder="100.00"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-[#12233D] mb-1.5">
+            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
               Chave PIX
             </label>
             <input
               type="text"
               value={pixKey}
               onChange={(event) => setPixKey(event.target.value)}
-              className="w-full border border-[#C7D1CB] rounded-md px-3.5 py-2.5 text-sm text-[#12233D] focus:outline-none focus:border-[#12233D]"
+              className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
               placeholder="CPF, e-mail, telefone ou chave aleatória"
             />
           </div>
@@ -201,26 +201,26 @@ export default function WalletPage() {
 
         {formError && <p className="text-sm text-red-600">{formError}</p>}
         {submitSuccess && (
-          <p className="text-sm text-[#2F6E48]">Saque solicitado com sucesso.</p>
+          <p className="text-sm text-[#1F8A5B]">Saque solicitado com sucesso.</p>
         )}
 
         <button
           type="submit"
           disabled={submitting}
-          className="bg-[#12233D] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#1B3350] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed self-start"
+          className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed self-start"
         >
           {submitting ? "Enviando..." : "Solicitar saque"}
         </button>
       </form>
 
       {/* Histórico */}
-      <div className="bg-white border border-[#C7D1CB] rounded-xl p-6">
-        <h2 className="text-sm font-semibold text-[#12233D] mb-4">
+      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
+        <h2 className="text-sm font-semibold text-[#0A0A0A] mb-4 uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
           Histórico de saques
         </h2>
 
         {withdrawals.length === 0 ? (
-          <p className="text-sm text-[#586268]">
+          <p className="text-sm text-[#3A3A3A]">
             Você ainda não solicitou nenhum saque.
           </p>
         ) : (
@@ -230,16 +230,16 @@ export default function WalletPage() {
               return (
                 <div
                   key={withdrawal.id ?? index}
-                  className="flex items-center justify-between gap-3 pb-3 border-b border-[#F1F4F2] last:border-b-0 last:pb-0"
+                  className="flex items-center justify-between gap-3 pb-3 border-b border-[#F5F2EC] last:border-b-0 last:pb-0"
                 >
                   <div>
-                    <p className="text-sm font-medium text-[#12233D]">
+                    <p className="text-sm font-medium text-[#0A0A0A]">
                       {typeof withdrawal.amount === "number"
                         ? formatCurrency(withdrawal.amount)
                         : "—"}
                     </p>
                     {withdrawal.createdAt && (
-                      <p className="text-xs text-[#586268]">
+                      <p className="text-xs text-[#3A3A3A]">
                         {formatDate(withdrawal.createdAt)}
                       </p>
                     )}

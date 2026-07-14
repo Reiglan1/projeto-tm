@@ -29,7 +29,7 @@ export default function StarRating({
           onMouseLeave={() => !readOnly && setHovered(null)}
           className={`bg-transparent border-none p-0 leading-none ${textSize} ${
             readOnly ? "cursor-default" : "cursor-pointer"
-          } ${star <= active ? "text-[#C97F1E]" : "text-[#C7D1CB]"}`}
+          } ${star <= active ? "text-[#C99A00]" : "text-[#D9D6D0]"}`}
           aria-label={`${star} estrela${star > 1 ? "s" : ""}`}
         >
           ★
