@@ -25,6 +25,8 @@ export const ROUTES = {
 
     CHAT: "/chamados/:serviceOrderId/chat",
 
+    MESSAGES: "/mensagens",
+
     // Páginas que não estão logadas
     LOGIN: "/login",
 

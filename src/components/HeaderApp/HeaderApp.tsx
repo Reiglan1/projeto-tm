@@ -135,7 +135,7 @@ export default function HeaderAuth() {
   function handleMessages() {
     setProfileOpen(false);
     setMenuOpen(false);
-    navigate(ROUTES.MY_SERVICE_ORDERS);
+    navigate(ROUTES.MESSAGES);
   }
 
   function handleWallet() {

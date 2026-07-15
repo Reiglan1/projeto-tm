@@ -154,6 +154,11 @@ const RouterConfig = createBrowserRouter([
                 errorElement: <ErrorElement />,
               },
               {
+                path: ROUTES.MESSAGES,
+                Component: ChatPage,
+                errorElement: <ErrorElement />,
+              },
+              {
                 path: ROUTES.PROFESSIONAL_WALLET,
                 Component: ProfessionalWalletPage,
                 errorElement: <ErrorElement />,

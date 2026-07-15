@@ -355,7 +355,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="max-w-5xl mx-auto px-6 py-16 text-center">
         <p className="text-sm text-[#3A3A3A]">Carregando seu perfil...</p>
       </div>
     );
@@ -363,7 +363,7 @@ export default function ProfilePage() {
 
   if (loadError || !profile) {
     return (
-      <div className="max-w-2xl mx-auto px-6 py-10">
+      <div className="max-w-5xl mx-auto px-6 py-16 text-center">
         <p className="text-sm text-red-600">
           {loadError ?? "Não foi possível carregar seu perfil"}
         </p>
@@ -372,72 +372,87 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Meu perfil</h1>
-        <p className="text-sm text-[#3A3A3A] mt-1">
+    <div className="max-w-5xl mx-auto px-6 sm:px-8 py-10 sm:py-14">
+      <div className="mb-9">
+        <h1 className="text-3xl sm:text-[42px] leading-none text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>Meu perfil</h1>
+        <p className="text-[15px] text-[#5C5C5C] mt-3">
           Membro desde {formatDate(profile.createdAt)}
         </p>
       </div>
 
-      {/* Verificação de identidade */}
-      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-sm font-semibold text-[#0A0A0A] uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
-            Verificação de identidade
-          </h2>
-          <p className="text-sm text-[#3A3A3A] mt-1">
-            {user?.role === "worker" && profile.verificationStatus
-              ? "Confira o status ou envie seus documentos."
-              : "Envie seus documentos para confirmar sua identidade."}
-          </p>
-        </div>
-        <button
-          onClick={() => navigate(ROUTES.VERIFICATION)}
-          className="bg-transparent border border-[#0A0A0A] text-[#0A0A0A] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#0A0A0A] hover:text-white transition-colors duration-150 shrink-0"
-        >
-          Verificar identidade
-        </button>
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
 
-      {/* Dados da conta */}
-      <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
-        <div className="flex flex-wrap gap-2 mb-6">
-          <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5F2EC] text-[#3A3A3A] px-2.5 py-1 rounded-full">
-            {profile.status}
-          </span>
-          <span
-            className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${profile.emailVerified
-              ? "bg-[#26A06D]/10 text-[#1F8A5B]"
-              : "bg-[#F5C518]/15 text-[#C99A00]"
-              }`}
-          >
-            {profile.emailVerified ? "E-mail verificado" : "E-mail não verificado"}
-          </span>
-          {!profile.emailVerified && (
+        {/* Coluna lateral fixa */}
+        <aside className="flex flex-col gap-5 lg:sticky lg:top-24">
+          <div className="bg-white border border-[#D9D6D0] rounded-xl p-6 text-center">
+            <span className="inline-flex w-16 h-16 rounded-full bg-[#0A0A0A] text-white items-center justify-center text-xl font-bold mb-4">
+              {name ? name.trim().split(/\s+/).map((p) => p[0]).slice(0, 2).join("").toUpperCase() : "?"}
+            </span>
+            <p className="font-bold text-[17px] text-[#0A0A0A] truncate">{profile.name}</p>
+            <p className="text-sm text-[#5C5C5C] truncate mt-0.5">{profile.email}</p>
+
+            <div className="flex flex-wrap justify-center gap-2 mt-5">
+              <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5F2EC] text-[#3A3A3A] px-2.5 py-1 rounded-full">
+                {profile.status}
+              </span>
+              <span
+                className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${profile.emailVerified
+                  ? "bg-[#26A06D]/10 text-[#1F8A5B]"
+                  : "bg-[#F5C518]/15 text-[#C99A00]"
+                  }`}
+              >
+                {profile.emailVerified ? "E-mail verificado" : "E-mail não verificado"}
+              </span>
+              {user?.role === "worker" && profile.verificationStatus && (
+                <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5C518]/15 text-[#3A3A3A] px-2.5 py-1 rounded-full">
+                  {profile.verificationStatus}
+                </span>
+              )}
+              {user?.role === "worker" && typeof profile.reviewCount === "number" && (
+                <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5C518]/15 text-[#C99A00] px-2.5 py-1 rounded-full">
+                  ★ {(profile.averageRating ?? 0).toFixed(1)} ({profile.reviewCount})
+                </span>
+              )}
+            </div>
+
+            {!profile.emailVerified && (
+              <button
+                type="button"
+                onClick={() => setShowVerificationModal(true)}
+                className="mt-4 w-full text-[13px] font-bold text-[#0A0A0A] bg-transparent border border-[#D9D6D0] rounded px-4 py-2.5 cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
+              >
+                Verificar e-mail
+              </button>
+            )}
+          </div>
+
+          <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
+            <h2 className="text-sm font-bold text-[#0A0A0A] mb-1.5">
+              Verificação de identidade
+            </h2>
+            <p className="text-sm text-[#5C5C5C] mb-4">
+              {user?.role === "worker" && profile.verificationStatus
+                ? "Confira o status ou envie seus documentos."
+                : "Envie seus documentos para confirmar sua identidade."}
+            </p>
             <button
-              type="button"
-              onClick={() => setShowVerificationModal(true)}
-              className="text-[11px] font-semibold uppercase tracking-wide text-[#3A3A3A] bg-transparent border-none cursor-pointer underline"
+              onClick={() => navigate(ROUTES.VERIFICATION)}
+              className="w-full bg-transparent border border-[#0A0A0A] text-[#0A0A0A] px-5 py-2.5 rounded text-[13px] font-bold cursor-pointer hover:bg-[#0A0A0A] hover:text-white transition-colors duration-150"
             >
-              Verificar
+              Verificar identidade
             </button>
-          )}
-          {user?.role === "worker" && profile.verificationStatus && (
-            <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5C518]/15 text-[#3A3A3A] px-2.5 py-1 rounded-full">
-              {profile.verificationStatus}
-            </span>
-          )}
-          {user?.role === "worker" && typeof profile.reviewCount === "number" && (
-            <span className="text-[11px] font-semibold uppercase tracking-wide bg-[#F5C518]/15 text-[#C99A00] px-2.5 py-1 rounded-full">
-              ★ {(profile.averageRating ?? 0).toFixed(1)} ({profile.reviewCount})
-            </span>
-          )}
-        </div>
+          </div>
+        </aside>
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+        {/* Conteúdo principal */}
+        <div className="flex flex-col gap-6 min-w-0">
+
+        {/* Dados da conta */}
+        <div className="bg-white border border-[#D9D6D0] rounded-xl p-6 sm:p-8">
+          <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
+            <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
               Nome completo
             </label>
             <input
@@ -447,31 +462,16 @@ export default function ProfilePage() {
                 setName(event.target.value);
                 setFieldErrors((current) => ({ ...current, name: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.name ? "border-red-400" : "border-[#D9D6D0]"
+              className={`w-full border rounded px-4 py-3 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.name ? "border-red-400" : "border-[#D9D6D0]"
                 }`}
             />
             {fieldErrors.name && (
-              <p className="text-xs text-red-600 mt-1">{fieldErrors.name}</p>
+              <p className="text-xs text-red-600 mt-1.5">{fieldErrors.name}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
-              E-mail
-            </label>
-            <input
-              type="email"
-              value={profile.email}
-              disabled
-              className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#3A3A3A] bg-[#F5F2EC] cursor-not-allowed"
-            />
-            <p className="text-xs text-[#3A3A3A] mt-1">
-              O e-mail não pode ser alterado por aqui.
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
+            <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
               Telefone
             </label>
             <input
@@ -482,23 +482,39 @@ export default function ProfilePage() {
                 setPhone(maskPhone(event.target.value));
                 setFieldErrors((current) => ({ ...current, phone: undefined }));
               }}
-              className={`w-full border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.phone ? "border-red-400" : "border-[#D9D6D0]"
+              className={`w-full border rounded px-4 py-3 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] ${fieldErrors.phone ? "border-red-400" : "border-[#D9D6D0]"
                 }`}
               placeholder="(00) 00000-0000"
             />
             {fieldErrors.phone && (
-              <p className="text-xs text-red-600 mt-1">{fieldErrors.phone}</p>
+              <p className="text-xs text-red-600 mt-1.5">{fieldErrors.phone}</p>
             )}
+          </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
-              Chave Pix <span className="text-[#3A3A3A] font-normal">(obrigatório)</span>
+            <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
+              E-mail
+            </label>
+            <input
+              type="email"
+              value={profile.email}
+              disabled
+              className="w-full border border-[#D9D6D0] rounded px-4 py-3 text-sm text-[#5C5C5C] bg-[#F5F2EC] cursor-not-allowed"
+            />
+            <p className="text-xs text-[#5C5C5C] mt-1.5">
+              O e-mail não pode ser alterado por aqui.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
+              Chave Pix <span className="text-[#5C5C5C] font-normal">(obrigatório)</span>
             </label>
 
             {editingPixKey ? (
               <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <select
                     value={pixKeyType}
                     onChange={(event) => {
@@ -506,7 +522,7 @@ export default function ProfilePage() {
                       setPixKeyValue("");
                       setFieldErrors((current) => ({ ...current, pixKey: undefined }));
                     }}
-                    className="w-36 shrink-0 border border-[#D9D6D0] rounded-md px-3 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] bg-white"
+                    className="sm:w-40 shrink-0 border border-[#D9D6D0] rounded px-3.5 py-3 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] bg-white"
                   >
                     <option value="">Tipo</option>
                     {PIX_KEY_TYPE_OPTIONS.map((option) => (
@@ -526,7 +542,7 @@ export default function ProfilePage() {
                     placeholder={
                       pixKeyType ? "Digite sua chave Pix" : "Escolha o tipo primeiro"
                     }
-                    className={`flex-1 min-w-0 border rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] disabled:bg-[#F5F2EC] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#D9D6D0]"
+                    className={`flex-1 min-w-0 border rounded px-4 py-3 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] disabled:bg-[#F5F2EC] disabled:cursor-not-allowed ${fieldErrors.pixKey ? "border-red-400" : "border-[#D9D6D0]"
                       }`}
                   />
                 </div>
@@ -541,18 +557,18 @@ export default function ProfilePage() {
                     setPixKeyValue("");
                     setFieldErrors((current) => ({ ...current, pixKey: undefined }));
                   }}
-                  className="text-xs text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer self-start"
+                  className="text-xs text-[#5C5C5C] font-medium underline bg-transparent border-none cursor-pointer self-start"
                 >
                   Cancelar
                 </button>
               </div>
             ) : profile.pixKeyType ? (
-              <div className="flex items-center justify-between gap-3 border border-[#D9D6D0] rounded-md px-3.5 py-2.5">
+              <div className="flex items-center justify-between gap-3 border border-[#D9D6D0] rounded px-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-[#0A0A0A]">
                     {pixKeyTypeLabel(profile.pixKeyType)}
                   </p>
-                  <p className="text-xs text-[#3A3A3A]">
+                  <p className="text-xs text-[#5C5C5C]">
                     {maskPixKeyDisplay(profile.pixKey)}
                   </p>
                 </div>
@@ -563,7 +579,7 @@ export default function ProfilePage() {
                     setPixKeyType(profile.pixKeyType ?? "");
                     setPixKeyValue("");
                   }}
-                  className="text-xs text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer shrink-0"
+                  className="text-xs text-[#5C5C5C] font-medium underline bg-transparent border-none cursor-pointer shrink-0"
                 >
                   Trocar
                 </button>
@@ -576,14 +592,14 @@ export default function ProfilePage() {
                   setPixKeyType("");
                   setPixKeyValue("");
                 }}
-                className="text-sm text-[#3A3A3A] font-medium underline bg-transparent border-none cursor-pointer"
+                className="text-sm text-[#5C5C5C] font-medium underline bg-transparent border-none cursor-pointer"
               >
                 + Adicionar chave Pix
               </button>
             )}
 
             {!editingPixKey && (
-              <p className="text-xs text-[#3A3A3A] mt-1.5">
+              <p className="text-xs text-[#5C5C5C] mt-1.5">
                 {profile.pixKeyType
                   ? "Usada para receber seus repasses/saques via Pix. Não é possível remover, só trocar por outra."
                   : "Usada para receber seus repasses/saques via Pix."}
@@ -593,7 +609,7 @@ export default function ProfilePage() {
 
           {user?.role === "worker" && (
             <div>
-              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
+              <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
                 Categorias de serviço
               </label>
               <CategoryPicker
@@ -604,21 +620,21 @@ export default function ProfilePage() {
                 hasError={Boolean(fieldErrors.categoryIds)}
               />
               {fieldErrors.categoryIds && (
-                <p className="text-xs text-red-600 mt-1">{fieldErrors.categoryIds}</p>
+                <p className="text-xs text-red-600 mt-1.5">{fieldErrors.categoryIds}</p>
               )}
             </div>
           )}
 
           {user?.role === "worker" && (
             <div>
-              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
-                Sobre você <span className="text-[#3A3A3A] font-normal">(opcional)</span>
+              <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
+                Sobre você <span className="text-[#5C5C5C] font-normal">(opcional)</span>
               </label>
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 rows={3}
-                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
+                className="w-full border border-[#D9D6D0] rounded px-4 py-3 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A] resize-none"
                 placeholder="Conte um pouco da sua experiência para os clientes"
               />
             </div>
@@ -643,74 +659,77 @@ export default function ProfilePage() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#0A0A0A] border-none text-white px-6 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="self-start bg-[#0A0A0A] border-none text-white px-7 py-3 rounded text-sm font-bold cursor-pointer hover:bg-[#242424] transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {saving ? "Salvando..." : "Salvar alterações"}
           </button>
-        </form>
-      </div>
-
-      {user && <ReviewsList subjectId={user.id} role={user.role} />}
-
-      {/* Zona de risco */}
-      <div className="bg-white border border-red-200 rounded-xl p-6">
-        <h2 className="text-sm font-semibold text-red-600 mb-1.5 uppercase" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400 }}>
-          Excluir conta
-        </h2>
-        <p className="text-sm text-[#3A3A3A] mb-4">
-          Essa ação é permanente e não pode ser desfeita.
-        </p>
-
-        {!confirmingDelete ? (
-          <button
-            onClick={() => setConfirmingDelete(true)}
-            className="bg-transparent border border-red-200 text-red-600 px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-red-50 transition-colors duration-150"
-          >
-            Excluir minha conta
-          </button>
-        ) : (
-          <form onSubmit={handleDelete} noValidate className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium text-[#0A0A0A] mb-1.5">
-                Confirme sua senha
-              </label>
-              <input
-                type="password"
-                value={deletePassword}
-                onChange={(event) => {
-                  setDeletePassword(event.target.value);
-                  setDeleteError(null);
-                }}
-                className="w-full border border-[#D9D6D0] rounded-md px-3.5 py-2.5 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
-                placeholder="••••••••"
-              />
-            </div>
-
-            {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
-
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={deleting}
-                className="bg-red-600 border-none text-white px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:bg-red-700 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {deleting ? "Excluindo..." : "Confirmar exclusão"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setConfirmingDelete(false);
-                  setDeletePassword("");
-                  setDeleteError(null);
-                }}
-                className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-5 py-2.5 rounded-md text-[13px] font-semibold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
-              >
-                Cancelar
-              </button>
-            </div>
           </form>
-        )}
+        </div>
+
+        {user && <ReviewsList subjectId={user.id} role={user.role} />}
+
+        {/* Zona de risco */}
+        <div className="bg-white border border-red-200 rounded-xl p-6 sm:p-8">
+          <h2 className="text-sm font-bold text-red-600 mb-1.5">
+            Excluir conta
+          </h2>
+          <p className="text-sm text-[#5C5C5C] mb-4">
+            Essa ação é permanente e não pode ser desfeita.
+          </p>
+
+          {!confirmingDelete ? (
+            <button
+              onClick={() => setConfirmingDelete(true)}
+              className="bg-transparent border border-red-200 text-red-600 px-5 py-2.5 rounded text-[13px] font-bold cursor-pointer hover:bg-red-50 transition-colors duration-150"
+            >
+              Excluir minha conta
+            </button>
+          ) : (
+            <form onSubmit={handleDelete} noValidate className="flex flex-col gap-3 max-w-sm">
+              <div>
+                <label className="block text-sm font-bold text-[#0A0A0A] mb-2">
+                  Confirme sua senha
+                </label>
+                <input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(event) => {
+                    setDeletePassword(event.target.value);
+                    setDeleteError(null);
+                  }}
+                  className="w-full border border-[#D9D6D0] rounded px-4 py-3 text-sm text-[#0A0A0A] focus:outline-none focus:border-[#0A0A0A]"
+                  placeholder="••••••••"
+                />
+              </div>
+
+              {deleteError && <p className="text-sm text-red-600">{deleteError}</p>}
+
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  disabled={deleting}
+                  className="bg-red-600 border-none text-white px-5 py-2.5 rounded text-[13px] font-bold cursor-pointer hover:bg-red-700 transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {deleting ? "Excluindo..." : "Confirmar exclusão"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmingDelete(false);
+                    setDeletePassword("");
+                    setDeleteError(null);
+                  }}
+                  className="bg-transparent border border-[#D9D6D0] text-[#0A0A0A] px-5 py-2.5 rounded text-[13px] font-bold cursor-pointer hover:border-[#0A0A0A] transition-colors duration-150"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
+        </div>
       </div>
+
       {user && (
         <EmailVerificationModal
           open={showVerificationModal}

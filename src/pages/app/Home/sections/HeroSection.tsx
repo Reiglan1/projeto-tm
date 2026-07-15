@@ -130,7 +130,7 @@ export default function HeroSection() {
             </p>
           )}
         </div>
-        {user?.role === "client" && (
+        {/* {user?.role === "client" && (
           <button
             onClick={scrollToProfessionals}
             className="inline-flex items-center gap-2.5 bg-[#0A0A0A] text-[#FAF7F1] rounded px-6 py-3.5 text-sm font-bold cursor-pointer hover:bg-[#242424] transition-colors duration-150 border-none"
@@ -140,7 +140,7 @@ export default function HeroSection() {
               <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
             </svg>
           </button>
-        )}
+        )} */}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr] gap-6 items-stretch">
@@ -233,17 +233,17 @@ export default function HeroSection() {
             <p className="relative text-sm leading-relaxed text-[#B5B5B5] max-w-[36ch] mb-4">
               Abra um chamado e acompanhe seu profissional em tempo real, com preço fechado antes de começar.
             </p>
-            {user?.role === "client" && (
+            {/* {user?.role === "client" && (
               <button
                 onClick={scrollToProfessionals}
                 className="relative inline-flex items-center gap-2.5 bg-[#F5C518] text-[#0A0A0A] rounded px-7 py-3.5 text-sm font-bold cursor-pointer hover:bg-[#FFE57A] transition-colors duration-150 border-none"
               >
-                Abrir chamado
+                VEJA AO VIVO
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                 </svg>
               </button>
-            )}
+            )} */}
             <div className="relative flex flex-wrap justify-center gap-2 mt-4">
               {["Elétrica", "Hidráulica", "Limpeza", "Reformas"].map((tag) => (
                 <span key={tag} className="text-[13px] font-medium text-[#D9D6D0] border border-[#3A3A3A] rounded-full px-3.5 py-1.5">
