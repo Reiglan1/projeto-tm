@@ -37,7 +37,6 @@ export default function ReviewsList({ subjectId, role }: ReviewsListProps) {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
-  const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +58,6 @@ export default function ReviewsList({ subjectId, role }: ReviewsListProps) {
         setReviews(response.items ?? []);
         setTotalPages(response.totalPages || 1);
         setTotalCount(response.totalCount || 0);
-        setAverageRating(response.averageRating || 0);
       })
       .catch((err: unknown) => {
         if (cancelled) return;
@@ -80,12 +78,9 @@ export default function ReviewsList({ subjectId, role }: ReviewsListProps) {
   return (
     <div className="bg-white border border-[#D9D6D0] rounded-xl p-6">
       <div className="flex items-center justify-between gap-3 mb-5">
-        <h2 className="text-sm font-semibold text-[#0A0A0A]">Avaliações recebidas</h2>
+        <h2 className="text-sm font-bold text-[#0A0A0A]">Avaliações recebidas</h2>
         {!loading && !error && totalCount > 0 && (
-          <span className="flex items-center gap-1.5 text-xs font-medium text-[#3A3A3A]">
-            <StarRating value={Math.round(averageRating)} readOnly size="sm" />
-            {averageRating.toFixed(1)} ({totalCount})
-          </span>
+          <span className="text-xs text-[#8A8A8A]">{totalCount} no total</span>
         )}
       </div>
 
@@ -94,7 +89,7 @@ export default function ReviewsList({ subjectId, role }: ReviewsListProps) {
       {!loading && error && <p className="text-sm text-red-600">{error}</p>}
 
       {!loading && !error && reviews.length === 0 && (
-        <p className="text-sm text-[#3A3A3A]">
+        <p className="text-sm text-[#8A8A8A] bg-[#FAF7F1] border border-dashed border-[#D9D6D0] rounded-lg px-4 py-6 text-center">
           {role === "worker"
             ? "Você ainda não recebeu nenhuma avaliação."
             : "Você ainda não recebeu nenhuma avaliação de profissionais."}
@@ -103,27 +98,29 @@ export default function ReviewsList({ subjectId, role }: ReviewsListProps) {
 
       {!loading && !error && reviews.length > 0 && (
         <>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
             {reviews.map((review) => (
               <div
                 key={review.id}
-                className="flex gap-3 pb-4 border-b border-[#F5F2EC] last:border-b-0 last:pb-0"
+                className="flex gap-3.5 py-4 border-b border-[#F0EDE6] last:border-b-0"
               >
-                <div className="w-9 h-9 rounded-full bg-[#F5F2EC] text-[#0A0A0A] text-xs font-semibold flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#0A0A0A] text-white text-xs font-bold flex items-center justify-center shrink-0">
                   {initials(review.reviewerName)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 flex-wrap">
-                    <p className="text-sm font-medium text-[#0A0A0A]">
+                    <p className="text-sm font-bold text-[#0A0A0A]">
                       {review.reviewerName}
                     </p>
-                    <p className="text-xs text-[#3A3A3A]">
+                    <p className="text-xs text-[#8A8A8A]">
                       {formatDate(review.createdAt)}
                     </p>
                   </div>
-                  <StarRating value={review.rating} readOnly size="sm" />
+                  <div className="mt-1">
+                    <StarRating value={review.rating} readOnly size="sm" />
+                  </div>
                   {review.comment && (
-                    <p className="text-sm text-[#3A3A3A] mt-1.5">{review.comment}</p>
+                    <p className="text-sm text-[#3A3A3A] mt-2 leading-relaxed">{review.comment}</p>
                   )}
                 </div>
               </div>

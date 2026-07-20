@@ -64,6 +64,9 @@ export default function OpenServiceOrderPage() {
   const [scheduledAt, setScheduledAt] = useState("");
   const [value, setValue] = useState("");
   const [address, setAddress] = useState("");
+  const [destinationCoords, setDestinationCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   const [submitting, setSubmitting] = useState(false);
@@ -121,6 +124,30 @@ export default function OpenServiceOrderPage() {
     return errors;
   }
 
+  function handleUseCurrentLocation() {
+    if (!("geolocation" in navigator)) {
+      setLocationError("Seu navegador não suporta localização");
+      return;
+    }
+    setLocating(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setDestinationCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setLocating(false);
+      },
+      () => {
+        setLocationError("Não foi possível obter sua localização");
+        setLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setSubmitError(null);
@@ -139,6 +166,8 @@ export default function OpenServiceOrderPage() {
         scheduledAt: new Date(scheduledAt).toISOString(),
         value: Number(value),
         address,
+        destinationLatitude: destinationCoords?.lat ?? null,
+        destinationLongitude: destinationCoords?.lng ?? null,
       });
       setSubmitSuccess(true);
     } catch (error) {
@@ -342,6 +371,30 @@ export default function OpenServiceOrderPage() {
               />
               {fieldErrors.address && (
                 <p className="text-xs text-red-600 mt-1.5">{fieldErrors.address}</p>
+              )}
+
+              <button
+                type="button"
+                onClick={handleUseCurrentLocation}
+                disabled={locating}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3A3A3A] bg-transparent border-none cursor-pointer hover:text-[#0A0A0A] mt-2 disabled:opacity-60"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                </svg>
+                {locating
+                  ? "Obtendo localização..."
+                  : destinationCoords
+                    ? "Localização anexada ✓"
+                    : "Usar minha localização atual"}
+              </button>
+              {locationError && (
+                <p className="text-xs text-red-600 mt-1">{locationError}</p>
+              )}
+              {destinationCoords && (
+                <p className="text-[11px] text-[#8A8A8A] mt-1">
+                  Isso ajuda o profissional a te achar e permite acompanhar a rota no mapa em tempo real.
+                </p>
               )}
             </div>
           </div>

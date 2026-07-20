@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLayout } from "@/context/LayoutProvider";
 import { useReveal } from "@/hooks/useReveal";
+import { useWorkerLiveLocation } from "@/hooks/useWorkerLiveLocation";
+import { useShareLocation } from "@/hooks/useShareLocation";
 import { getServiceOrders } from "@/services/serviceOrder";
 import { ResponseServiceOrderJason } from "@/types/serviceOrder";
 import { SERVICE_ORDER_STATUS } from "@/constants/ServiceOrderStatus";
@@ -9,6 +11,16 @@ import { buildChatPath, ROUTES } from "@/constants/Constants";
 import { getWalletBalance } from "@/services/wallet";
 import { getClientWallet } from "@/services/clientWallet";
 import { BALANCE_KEYS, formatCurrency, pickBalanceNumber } from "@/utils/Wallet";
+import LiveTrackingMap from "@/components/LiveTrackingMap/LiveTrackingMap";
+
+function formatLastUpdate(value: string | null): string {
+  if (!value) return "";
+  const diffMs = Date.now() - new Date(value).getTime();
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin <= 0) return "agora mesmo";
+  if (diffMin === 1) return "há 1 min";
+  return `há ${diffMin} min`;
+}
 
 function getInitials(name?: string): string {
   if (!name) return "?";
@@ -103,6 +115,45 @@ export default function HeroSection() {
   const statusLabel =
     activeOrder?.status === SERVICE_ORDER_STATUS.IN_PROGRESS ? "Em andamento" : "A caminho";
 
+  const trackingEnabled = Boolean(
+    activeOrder && user?.role === "client" &&
+    (activeOrder.status === SERVICE_ORDER_STATUS.ACCEPTED ||
+      activeOrder.status === SERVICE_ORDER_STATUS.IN_PROGRESS)
+  );
+  const { location: workerLocation } = useWorkerLiveLocation(activeOrder?.id, trackingEnabled);
+
+  const destinationPosition =
+    activeOrder?.destinationLatitude != null && activeOrder?.destinationLongitude != null
+      ? { lat: activeOrder.destinationLatitude, lng: activeOrder.destinationLongitude }
+      : null;
+  const workerPosition =
+    workerLocation?.available && workerLocation.latitude != null && workerLocation.longitude != null
+      ? { lat: workerLocation.latitude, lng: workerLocation.longitude }
+      : null;
+
+  const isWorker = user?.role === "worker";
+  const workerHasActiveRoute = Boolean(
+    activeOrder &&
+    isWorker &&
+    (activeOrder.status === SERVICE_ORDER_STATUS.ACCEPTED ||
+      activeOrder.status === SERVICE_ORDER_STATUS.IN_PROGRESS)
+  );
+  const [sharingOptIn, setSharingOptIn] = useState(false);
+  const shareStatus = useShareLocation(workerHasActiveRoute && sharingOptIn);
+
+  const shareStatusMeta: Record<string, { label: string; className: string }> = {
+    idle: { label: "Localização não compartilhada", className: "text-[#8A8A8A]" },
+    requesting: { label: "Solicitando permissão...", className: "text-[#C99A00]" },
+    sharing: { label: "Compartilhando sua localização", className: "text-[#1F8A5B]" },
+    denied: { label: "Permissão de localização negada", className: "text-red-600" },
+    unavailable: {
+      label: "Serviço de localização indisponível neste dispositivo/navegador",
+      className: "text-red-600",
+    },
+    unsupported: { label: "Seu navegador não suporta localização", className: "text-red-600" },
+    error: { label: "Não foi possível obter sua localização", className: "text-red-600" },
+  };
+
   return (
     <section ref={scopeRef} className="max-w-[1240px] mx-auto px-6 sm:px-8 pt-10 pb-12 sm:pt-14 sm:pb-16">
       <div className="flex items-end justify-between gap-6 flex-wrap mb-8" data-reveal>
@@ -130,7 +181,7 @@ export default function HeroSection() {
             </p>
           )}
         </div>
-        {/* {user?.role === "client" && (
+        {user?.role === "client" && (
           <button
             onClick={scrollToProfessionals}
             className="inline-flex items-center gap-2.5 bg-[#0A0A0A] text-[#FAF7F1] rounded px-6 py-3.5 text-sm font-bold cursor-pointer hover:bg-[#242424] transition-colors duration-150 border-none"
@@ -140,27 +191,61 @@ export default function HeroSection() {
               <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
             </svg>
           </button>
-        )} */}
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr] gap-6 items-stretch">
         {activeOrder ? (
-          <div data-reveal className="bg-white border border-[#D9D6D0] rounded-xl overflow-hidden">
+          <div className="bg-white border border-[#D9D6D0] rounded-xl overflow-hidden">
             <div className="relative h-[220px] bg-[#EDE9E1]">
-              <iframe
-                title="Rota do profissional"
-                src="https://maps.google.com/maps?saddr=-23.5629,-46.6544&daddr=-23.5505,-46.6333&output=embed"
-                className="w-full h-full border-0 block grayscale-[.35] contrast-[1.02]"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-              <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 bg-[#0A0A0A] text-white text-[10px] font-bold tracking-[.12em] uppercase px-2.5 py-1.5 rounded-full">
-                <span className="tm-live-dot w-[7px] h-[7px] rounded-full bg-[#E63946] inline-block" />
-                Ao vivo
-              </span>
-              <span className="absolute top-4 right-4 font-mono text-[11px] text-[#0A0A0A] bg-[#F5C518] px-2.5 py-1.5 rounded-full font-semibold">
-                EM ROTA · 8 MIN
-              </span>
+              {isWorker ? (
+                destinationPosition ? (
+                  <LiveTrackingMap
+                    className="grayscale-[.15] contrast-[1.02]"
+                    workerPosition={workerPosition}
+                    destinationPosition={destinationPosition}
+                    workerLabel="Você"
+                    destinationLabel={`Endereço de ${counterpartName ?? "cliente"}`}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-center px-6">
+                    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <p className="text-xs text-[#5C5C5C]">
+                      Esse chamado não tem um endereço com localização
+                    </p>
+                  </div>
+                )
+              ) : workerPosition ? (
+                <LiveTrackingMap
+                  className="grayscale-[.15] contrast-[1.02]"
+                  workerPosition={workerPosition}
+                  destinationPosition={destinationPosition}
+                  workerLabel={counterpartName ?? "Profissional"}
+                  destinationLabel="Seu endereço"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-center px-6">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <p className="text-xs text-[#5C5C5C]">
+                    Localização do profissional ainda não disponível
+                  </p>
+                </div>
+              )}
+              {!isWorker && (
+                <span className="absolute top-4 left-4 inline-flex items-center gap-1.5 bg-[#0A0A0A] text-white text-[10px] font-bold tracking-[.12em] uppercase px-2.5 py-1.5 rounded-full z-[400]">
+                  <span className="tm-live-dot w-[7px] h-[7px] rounded-full bg-[#E63946] inline-block" />
+                  Ao vivo
+                </span>
+              )}
+              {!isWorker && workerLocation?.lastLocationAt && (
+                <span className="absolute top-4 right-4 font-mono text-[11px] text-[#0A0A0A] bg-[#F5C518] px-2.5 py-1.5 rounded-full font-semibold z-[400]">
+                  {formatLastUpdate(workerLocation.lastLocationAt)}
+                </span>
+              )}
             </div>
             <div className="p-5">
               <div className="flex items-center justify-between gap-3">
@@ -177,20 +262,48 @@ export default function HeroSection() {
                 </div>
                 <span className="font-mono text-[11px] text-[#8A8A8A]">#{activeOrder.id.slice(0, 8).toUpperCase()}</span>
               </div>
-              <div className="mt-5">
-                <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#0A0A0A]">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1F8A5B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                    </svg>
-                    {statusLabel}
-                  </span>
-                  <span className="font-mono text-xs text-[#5C5C5C]">chega em ~8 min</span>
+              {isWorker ? (
+                <div className="mt-5 flex items-center justify-between gap-3 bg-[#F5F2EC] rounded-lg px-4 py-3">
+                  <div>
+                    <p className="text-[13px] font-bold text-[#0A0A0A]">Compartilhar localização</p>
+                    <p className={`text-xs mt-0.5 ${shareStatusMeta[shareStatus].className}`}>
+                      {shareStatusMeta[shareStatus].label}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSharingOptIn((current) => !current)}
+                    className={`shrink-0 relative w-11 h-6 rounded-full transition-colors duration-150 border-none cursor-pointer ${sharingOptIn ? "bg-[#1F8A5B]" : "bg-[#D9D6D0]"
+                      }`}
+                    aria-label="Ativar ou desativar compartilhamento de localização"
+                  >
+                    <span
+                      className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-150 ${sharingOptIn ? "translate-x-[22px]" : "translate-x-0.5"
+                        }`}
+                    />
+                  </button>
                 </div>
-                <div className="mt-2.5 h-1.5 bg-[#EDE9E1] rounded-full overflow-hidden">
-                  <div className="tm-route-fill h-full bg-[#0A0A0A] rounded-full" />
+              ) : (
+                <div className="mt-5">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#0A0A0A]">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1F8A5B" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+                      </svg>
+                      {statusLabel}
+                    </span>
+                    <span className="font-mono text-xs text-[#5C5C5C]">
+                      {workerPosition
+                        ? `atualizado ${formatLastUpdate(workerLocation?.lastLocationAt ?? null)}`
+                        : "aguardando localização"}
+                    </span>
+                  </div>
+                  {workerPosition && (
+                    <div className="mt-2.5 h-1.5 bg-[#EDE9E1] rounded-full overflow-hidden">
+                      <div className="tm-route-fill h-full bg-[#0A0A0A] rounded-full" />
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
               <div className="flex gap-3 mt-5">
                 <button
                   onClick={() => navigate(buildChatPath(activeOrder.id))}
@@ -212,7 +325,6 @@ export default function HeroSection() {
           </div>
         ) : (
           <div
-            data-reveal
             className="relative bg-[#0A0A0A] text-[#FAF7F1] rounded-xl px-8 sm:px-11 py-5 text-center flex flex-col items-center justify-center overflow-hidden min-h-[320px] sm:min-h-[433px]"
           >
             <span className="absolute -top-8 -right-8 w-[150px] h-[150px] bg-[#F5C518] opacity-[.12]" />
@@ -233,17 +345,17 @@ export default function HeroSection() {
             <p className="relative text-sm leading-relaxed text-[#B5B5B5] max-w-[36ch] mb-4">
               Abra um chamado e acompanhe seu profissional em tempo real, com preço fechado antes de começar.
             </p>
-            {/* {user?.role === "client" && (
+            {user?.role === "client" && (
               <button
                 onClick={scrollToProfessionals}
                 className="relative inline-flex items-center gap-2.5 bg-[#F5C518] text-[#0A0A0A] rounded px-7 py-3.5 text-sm font-bold cursor-pointer hover:bg-[#FFE57A] transition-colors duration-150 border-none"
               >
-                VEJA AO VIVO
+                Abrir chamado
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
                 </svg>
               </button>
-            )} */}
+            )}
             <div className="relative flex flex-wrap justify-center gap-2 mt-4">
               {["Elétrica", "Hidráulica", "Limpeza", "Reformas"].map((tag) => (
                 <span key={tag} className="text-[13px] font-medium text-[#D9D6D0] border border-[#3A3A3A] rounded-full px-3.5 py-1.5">

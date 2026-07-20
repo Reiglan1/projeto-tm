@@ -9,6 +9,7 @@ export interface ResponseWorkerDetailJason {
   id: string;
   name: string;
   email: string;
+  personType: string | null;
   phone: string;
   status: string;
   verificationStatus: string;
@@ -21,6 +22,8 @@ export interface ResponseWorkerDetailJason {
   professions: ResponseWorkerProfessionJason[];
   averageRating: number;
   reviewCount: number;
+  // Só vem preenchido quando a busca (GET /api/workers) inclui lat/lng.
+  distanceKm: number | null;
   createdAt: string;
 }
 
@@ -40,4 +43,18 @@ export interface RequestUpdateWorkerJason {
   available24Hours: boolean;
   pixKey?: string;
   pixKeyType?: string;
+}
+
+export interface RequestLocationConsentJason {
+  scope: string;
+}
+
+export interface ResponseLocationConsentJason {
+  scope: string | null;
+  acceptedAt: string | null;
+}
+
+export interface RequestWorkerLocationJason {
+  latitude: number;
+  longitude: number;
 }

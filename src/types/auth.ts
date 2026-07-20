@@ -14,6 +14,8 @@ export interface RequestClientJason {
   email: string;
   cpf: string;
   phone: string;
+  pixKey?: string;
+  pixKeyType?: string;
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;
@@ -22,10 +24,14 @@ export interface RequestClientJason {
 export interface RequestWorkerJason {
   name: string;
   email: string;
+  personType?: string; // "Fisica" | "Juridica" (novo no back-end; PF continua sendo o fluxo padrão)
   cpf: string;
+  cnpj?: string;
   phone: string;
   categoryIds: string[];
   description?: string;
+  pixKey?: string;
+  pixKeyType?: string;
   password: string;
   confirmPassword: string;
   acceptTerms: boolean;

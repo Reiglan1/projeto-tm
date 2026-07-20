@@ -6,6 +6,7 @@ import {
   RequestUpdateServiceOrderStatusJason,
   ResponseAllServiceOrdersJason,
   ResponseServiceOrderJason,
+  ResponseWorkerLiveLocationJason,
 } from "@/types/serviceOrder";
 
 export interface GetServiceOrdersParams {
@@ -80,6 +81,21 @@ export async function updateServiceOrderStatus(
     const { data } = await api.patch<ResponseServiceOrderJason>(
       `/api/service-orders/${id}/status`,
       payload
+    );
+    return data;
+  } catch (error) {
+    throw normalizeError(error);
+  }
+}
+
+// Posição do profissional em tempo real durante um chamado em rota
+// (usada pra mostrar no mapa da tela de acompanhamento).
+export async function getWorkerLiveLocation(
+  serviceOrderId: string
+): Promise<ResponseWorkerLiveLocationJason> {
+  try {
+    const { data } = await api.get<ResponseWorkerLiveLocationJason>(
+      `/api/service-orders/${serviceOrderId}/worker-location`
     );
     return data;
   } catch (error) {

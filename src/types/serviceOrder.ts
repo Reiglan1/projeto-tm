@@ -7,6 +7,8 @@ export interface RequestCreateServiceOrderJason {
   scheduledAt: string; // ISO date-time
   value: number;
   address: string;
+  destinationLatitude?: number | null;
+  destinationLongitude?: number | null;
 }
 
 export interface ResponseServiceOrderJason {
@@ -21,6 +23,9 @@ export interface ResponseServiceOrderJason {
   scheduledAt: string;
   value: number;
   address: string;
+  destinationLatitude: number | null;
+  destinationLongitude: number | null;
+  arrivedAt: string | null;
   status: string;
   cancelledAt: string | null;
   cancelledBy: string | null;
@@ -43,4 +48,11 @@ export interface RequestCancelServiceOrderJason {
 
 export interface RequestUpdateServiceOrderStatusJason {
   status: string;
+}
+
+export interface ResponseWorkerLiveLocationJason {
+  available: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  lastLocationAt: string | null;
 }

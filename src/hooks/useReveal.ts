@@ -19,9 +19,6 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
     const scope = scopeRef.current;
     if (!scope) return;
 
-    const els = Array.from(scope.querySelectorAll<HTMLElement>("[data-reveal]"));
-    if (!els.length) return;
-
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -37,16 +34,39 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
       { threshold: 0.12, rootMargin: "0px 0px -8% 0px" }
     );
 
-    els.forEach((el) => {
+    function revealOrObserve(el: HTMLElement) {
+      if (el.classList.contains("tm-in")) return;
       const rect = el.getBoundingClientRect();
       if (rect.top < window.innerHeight * 0.9) {
         el.classList.add("tm-in");
       } else {
         io.observe(el);
       }
-    });
+    }
 
-    return () => io.disconnect();
+    // Elementos já presentes no primeiro render.
+    scope.querySelectorAll<HTMLElement>("[data-reveal]").forEach(revealOrObserve);
+
+    // Elementos que aparecem depois (ex: conteúdo que só existe após um
+    // fetch assíncrono terminar) — sem isso, ficavam presos em opacity:0
+    // pra sempre, já que o scan acima só roda uma vez no mount.
+    const mutationObserver = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (!(node instanceof HTMLElement)) return;
+          if (node.matches("[data-reveal]")) revealOrObserve(node);
+          node
+            .querySelectorAll<HTMLElement>("[data-reveal]")
+            .forEach(revealOrObserve);
+        });
+      });
+    });
+    mutationObserver.observe(scope, { childList: true, subtree: true });
+
+    return () => {
+      io.disconnect();
+      mutationObserver.disconnect();
+    };
   }, []);
 
   return scopeRef;

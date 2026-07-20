@@ -238,14 +238,9 @@ export default function ClientWalletPage() {
 
                 {/* Depositar */}
                 <div className="bg-white border border-[#D9D6D0] rounded-xl p-6 flex flex-col gap-4 h-full">
-                    <div>
-                        <h2 className="text-sm font-bold text-[#0A0A0A]">
-                            Depositar via Pix
-                        </h2>
-                        <p className="text-xs text-[#5C5C5C] mt-1">
-                            Faça o deposito para movimentar.
-                        </p>
-                    </div>
+                    <h2 className="text-sm font-bold text-[#0A0A0A]">
+                        Depositar via Pix
+                    </h2>
 
                     {!deposit ? (
                         <form onSubmit={handleDeposit} noValidate className="flex flex-col gap-4 flex-1">
