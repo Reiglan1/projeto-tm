@@ -4,8 +4,9 @@ import {
   revokeWorkerLocationConsent,
   sendWorkerLocation,
 } from "@/services/workers";
+import { ensureLocationConnectionStarted, sendLocationUpdate } from "@/services/locationHub";
 
-const MIN_SEND_INTERVAL_MS = 15000;
+const MIN_REST_SEND_INTERVAL_MS = 15000;
 
 export type ShareLocationStatus =
   | "idle"
@@ -25,28 +26,30 @@ function describeGeoError(code: number): ShareLocationStatus {
 
 /**
  * Enquanto `active` for true, observa a posição do navegador e envia
- * atualizações pro back-end (limitadas a 1 a cada MIN_SEND_INTERVAL_MS pra
- * não spammar). Ao desativar (ou desmontar), revoga o consentimento e para
- * de observar.
+ * atualizações pro back-end de duas formas, conforme especificado pelo
+ * back-end:
+ *  1. Via SignalR (`UpdateLocation`), em toda atualização de posição —
+ *     é o caminho principal de tempo real.
+ *  2. Via `POST /api/workers/me/location`, limitado a 1 a cada
+ *     MIN_REST_SEND_INTERVAL_MS — mantém a posição sincronizada em segundo
+ *     plano (é o que a busca por proximidade e o fallback REST usam).
  *
- * IMPORTANTE: o pedido de permissão de localização ao navegador é disparado
- * imediatamente, sem esperar nenhuma chamada de API nossa terminar primeiro.
- * O registro de consentimento no back-end roda em paralelo, best-effort — se
- * ele falhar (endpoint fora do ar, CORS, etc.) isso não deve impedir o
- * navegador de perguntar a permissão nem de compartilhar a localização.
+ * O pedido de permissão de localização ao navegador é disparado
+ * imediatamente, sem esperar nenhuma chamada de API nossa terminar primeiro
+ * — o registro de consentimento roda em paralelo, best-effort.
  *
  * Em desktops/VMs sem GPS, a primeira tentativa (alta precisão) pode falhar
  * com POSITION_UNAVAILABLE — nesse caso tentamos de novo com baixa precisão
  * (geralmente localização por IP/Wi-Fi, mais tolerante nesses ambientes).
  */
-export function useShareLocation(active: boolean) {
+export function useShareLocation(serviceOrderId: string | undefined, active: boolean) {
   const [status, setStatus] = useState<ShareLocationStatus>("idle");
   const watchIdRef = useRef<number | null>(null);
-  const lastSentAtRef = useRef(0);
+  const lastRestSendAtRef = useRef(0);
   const fellBackRef = useRef(false);
 
   useEffect(() => {
-    if (!active) {
+    if (!active || !serviceOrderId) {
       setStatus("idle");
       return;
     }
@@ -59,11 +62,18 @@ export function useShareLocation(active: boolean) {
     let cancelled = false;
     fellBackRef.current = false;
     setStatus("requesting");
+    const orderId = serviceOrderId;
 
     // Best-effort: registra o consentimento no back-end, mas não bloqueia
     // (nem é bloqueado por) o pedido de localização ao navegador.
-    setWorkerLocationConsent({ scope: "service_order" }).catch((err) => {
+    // "WhileInUse" == compartilha só enquanto o app está em uso (valor
+    // esperado pelo back-end; ver documentação do endpoint de consentimento).
+    setWorkerLocationConsent({ scope: "WhileInUse" }).catch((err) => {
       console.warn("[useShareLocation] falha ao registrar consentimento:", err);
+    });
+
+    ensureLocationConnectionStarted().catch((err) => {
+      console.warn("[useShareLocation] falha ao conectar no hub de localização:", err);
     });
 
     function startWatch(highAccuracy: boolean) {
@@ -76,17 +86,28 @@ export function useShareLocation(active: boolean) {
           if (cancelled) return;
           setStatus("sharing");
 
-          const now = Date.now();
-          if (now - lastSentAtRef.current < MIN_SEND_INTERVAL_MS) return;
-          lastSentAtRef.current = now;
+          const { latitude, longitude } = position.coords;
 
-          sendWorkerLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          }).catch(() => {
-            // Uma falha isolada de envio não é crítica; a próxima
-            // atualização de posição tenta de novo.
-          });
+          // Caminho principal: SignalR, em toda atualização de posição.
+          sendLocationUpdate(orderId, latitude, longitude);
+
+          // Caminho secundário: REST, limitado a 1x a cada 15s, mantém a
+          // última posição sincronizada mesmo se o hub cair.
+          const now = Date.now();
+          if (now - lastRestSendAtRef.current < MIN_REST_SEND_INTERVAL_MS) return;
+          lastRestSendAtRef.current = now;
+
+          sendWorkerLocation({ latitude, longitude })
+            .then(() => {
+              console.info("[useShareLocation] posição enviada via REST com sucesso", {
+                lat: latitude,
+                lng: longitude,
+                at: new Date().toISOString(),
+              });
+            })
+            .catch((err) => {
+              console.error("[useShareLocation] falha ao enviar localização via REST:", err);
+            });
         },
         (geoError) => {
           if (cancelled) return;
@@ -126,7 +147,7 @@ export function useShareLocation(active: boolean) {
         // naturalmente do lado do back-end.
       });
     };
-  }, [active]);
+  }, [serviceOrderId, active]);
 
   return status;
 }

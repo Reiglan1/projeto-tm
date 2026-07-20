@@ -1,25 +1,8 @@
-import { useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L from "leaflet";
+import { useEffect, useRef } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
-// Ícones customizados (evita o bug clássico do Leaflet com bundlers, que
-// quebra o caminho dos PNGs padrão) — usamos divIcon com HTML/CSS no
-// estilo visual do Three Minds em vez dos pinos genéricos do Leaflet.
-const workerIcon = L.divIcon({
-  className: "",
-  html: `<div style="width:34px;height:34px;border-radius:9999px;background:#0A0A0A;border:3px solid #F5C518;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;">
-    <div style="width:8px;height:8px;border-radius:9999px;background:#F5C518;"></div>
-  </div>`,
-  iconSize: [34, 34],
-  iconAnchor: [17, 17],
-});
-
-const destinationIcon = L.divIcon({
-  className: "",
-  html: `<div style="width:16px;height:16px;border-radius:9999px 9999px 9999px 0;background:#0A0A0A;transform:rotate(45deg);border:2px solid #FAF7F1;box-shadow:0 2px 6px rgba(0,0,0,.35);"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 14],
-});
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 interface LatLng {
   lat: number;
@@ -34,20 +17,38 @@ interface LiveTrackingMapProps {
   className?: string;
 }
 
-function FitBounds({ points }: { points: LatLng[] }) {
-  const map = useMap();
+// Marcadores customizados no estilo da marca (preto + amarelo), em vez dos
+// pinos padrão do Mapbox.
+function createWorkerMarkerEl(): HTMLDivElement {
+  const el = document.createElement("div");
+  el.style.width = "34px";
+  el.style.height = "34px";
+  el.style.borderRadius = "9999px";
+  el.style.background = "#0A0A0A";
+  el.style.border = "3px solid #F5C518";
+  el.style.boxShadow = "0 2px 8px rgba(0,0,0,.35)";
+  el.style.display = "flex";
+  el.style.alignItems = "center";
+  el.style.justifyContent = "center";
+  const dot = document.createElement("div");
+  dot.style.width = "8px";
+  dot.style.height = "8px";
+  dot.style.borderRadius = "9999px";
+  dot.style.background = "#F5C518";
+  el.appendChild(dot);
+  return el;
+}
 
-  useEffect(() => {
-    if (points.length === 0) return;
-    if (points.length === 1) {
-      map.setView([points[0].lat, points[0].lng], 15);
-      return;
-    }
-    const bounds = L.latLngBounds(points.map((p) => [p.lat, p.lng]));
-    map.fitBounds(bounds, { padding: [36, 36], maxZoom: 15 });
-  }, [map, points]);
-
-  return null;
+function createDestinationMarkerEl(): HTMLDivElement {
+  const el = document.createElement("div");
+  el.style.width = "16px";
+  el.style.height = "16px";
+  el.style.borderRadius = "9999px 9999px 9999px 0";
+  el.style.background = "#0A0A0A";
+  el.style.transform = "rotate(45deg)";
+  el.style.border = "2px solid #FAF7F1";
+  el.style.boxShadow = "0 2px 6px rgba(0,0,0,.35)";
+  return el;
 }
 
 export default function LiveTrackingMap({
@@ -57,38 +58,102 @@ export default function LiveTrackingMap({
   destinationLabel = "Destino",
   className = "",
 }: LiveTrackingMapProps) {
-  const points = [workerPosition, destinationPosition].filter(
-    (p): p is LatLng => Boolean(p)
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const workerMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const destinationMarkerRef = useRef<mapboxgl.Marker | null>(null);
 
-  const center = points[0] ?? { lat: -14.235, lng: -51.9253 }; // fallback: centro do Brasil
+  // Cria o mapa uma única vez.
+  useEffect(() => {
+    if (!containerRef.current || mapRef.current) return;
 
-  return (
-    <MapContainer
-      center={[center.lat, center.lng]}
-      zoom={14}
-      scrollWheelZoom={false}
-      className={className}
-      style={{ width: "100%", height: "100%" }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    const initialCenter = workerPosition ?? destinationPosition ?? { lat: -14.235, lng: -51.9253 };
 
-      {workerPosition && (
-        <Marker position={[workerPosition.lat, workerPosition.lng]} icon={workerIcon}>
-          <Popup>{workerLabel}</Popup>
-        </Marker>
-      )}
+    mapRef.current = new mapboxgl.Map({
+      container: containerRef.current,
+      style: "mapbox://styles/mapbox/light-v11",
+      // Mapbox usa [longitude, latitude], ao contrário de Leaflet/Google.
+      center: [initialCenter.lng, initialCenter.lat],
+      zoom: 14,
+      scrollZoom: false,
+      attributionControl: true,
+    });
 
-      {destinationPosition && (
-        <Marker position={[destinationPosition.lat, destinationPosition.lng]} icon={destinationIcon}>
-          <Popup>{destinationLabel}</Popup>
-        </Marker>
-      )}
+    mapRef.current.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-left");
 
-      <FitBounds points={points} />
-    </MapContainer>
-  );
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+      workerMarkerRef.current = null;
+      destinationMarkerRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Atualiza/cria o marcador do profissional.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!workerPosition) {
+      workerMarkerRef.current?.remove();
+      workerMarkerRef.current = null;
+      return;
+    }
+
+    if (!workerMarkerRef.current) {
+      workerMarkerRef.current = new mapboxgl.Marker({ element: createWorkerMarkerEl() })
+        .setLngLat([workerPosition.lng, workerPosition.lat])
+        .setPopup(new mapboxgl.Popup({ offset: 20 }).setText(workerLabel))
+        .addTo(map);
+    } else {
+      workerMarkerRef.current.setLngLat([workerPosition.lng, workerPosition.lat]);
+    }
+  }, [workerPosition, workerLabel]);
+
+  // Atualiza/cria o marcador do destino.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    if (!destinationPosition) {
+      destinationMarkerRef.current?.remove();
+      destinationMarkerRef.current = null;
+      return;
+    }
+
+    if (!destinationMarkerRef.current) {
+      destinationMarkerRef.current = new mapboxgl.Marker({ element: createDestinationMarkerEl() })
+        .setLngLat([destinationPosition.lng, destinationPosition.lat])
+        .setPopup(new mapboxgl.Popup({ offset: 14 }).setText(destinationLabel))
+        .addTo(map);
+    } else {
+      destinationMarkerRef.current.setLngLat([destinationPosition.lng, destinationPosition.lat]);
+    }
+  }, [destinationPosition, destinationLabel]);
+
+  // Enquadra os dois pontos (ou centraliza no único disponível) sempre que
+  // alguma posição muda.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const points = [workerPosition, destinationPosition].filter(
+      (p): p is LatLng => Boolean(p)
+    );
+    if (points.length === 0) return;
+
+    if (points.length === 1) {
+      map.easeTo({ center: [points[0].lng, points[0].lat], zoom: 15, duration: 600 });
+      return;
+    }
+
+    const bounds = points.reduce(
+      (acc, p) => acc.extend([p.lng, p.lat]),
+      new mapboxgl.LngLatBounds([points[0].lng, points[0].lat], [points[0].lng, points[0].lat])
+    );
+    map.fitBounds(bounds, { padding: 48, maxZoom: 15, duration: 600 });
+  }, [workerPosition, destinationPosition]);
+
+  return <div ref={containerRef} className={className} style={{ width: "100%", height: "100%" }} />;
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLayout } from "@/context/LayoutProvider";
 import { useReveal } from "@/hooks/useReveal";
@@ -11,7 +11,18 @@ import { buildChatPath, ROUTES } from "@/constants/Constants";
 import { getWalletBalance } from "@/services/wallet";
 import { getClientWallet } from "@/services/clientWallet";
 import { BALANCE_KEYS, formatCurrency, pickBalanceNumber } from "@/utils/Wallet";
-import LiveTrackingMap from "@/components/LiveTrackingMap/LiveTrackingMap";
+
+// O Mapbox GL é pesado (~500kb) — carrega só quando o card com mapa
+// realmente precisa aparecer, em vez de entrar no bundle principal da Home.
+const LiveTrackingMap = lazy(() => import("@/components/LiveTrackingMap/LiveTrackingMap"));
+
+function MapFallback() {
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+      <p className="text-xs text-[#8A8A8A]">Carregando mapa...</p>
+    </div>
+  );
+}
 
 function formatLastUpdate(value: string | null): string {
   if (!value) return "";
@@ -112,15 +123,17 @@ export default function HeroSection() {
   }
 
   const counterpartName = user?.role === "client" ? activeOrder?.workerName : activeOrder?.clientName;
-  const statusLabel =
-    activeOrder?.status === SERVICE_ORDER_STATUS.IN_PROGRESS ? "Em andamento" : "A caminho";
 
   const trackingEnabled = Boolean(
     activeOrder && user?.role === "client" &&
     (activeOrder.status === SERVICE_ORDER_STATUS.ACCEPTED ||
       activeOrder.status === SERVICE_ORDER_STATUS.IN_PROGRESS)
   );
-  const { location: workerLocation } = useWorkerLiveLocation(activeOrder?.id, trackingEnabled);
+  const { location: workerLocation, arrivedAt } = useWorkerLiveLocation(activeOrder?.id, trackingEnabled);
+
+  const statusLabel = arrivedAt
+    ? "Chegou!"
+    : activeOrder?.status === SERVICE_ORDER_STATUS.IN_PROGRESS ? "Em andamento" : "A caminho";
 
   const destinationPosition =
     activeOrder?.destinationLatitude != null && activeOrder?.destinationLongitude != null
@@ -139,7 +152,7 @@ export default function HeroSection() {
       activeOrder.status === SERVICE_ORDER_STATUS.IN_PROGRESS)
   );
   const [sharingOptIn, setSharingOptIn] = useState(false);
-  const shareStatus = useShareLocation(workerHasActiveRoute && sharingOptIn);
+  const shareStatus = useShareLocation(activeOrder?.id, workerHasActiveRoute && sharingOptIn);
 
   const shareStatusMeta: Record<string, { label: string; className: string }> = {
     idle: { label: "Localização não compartilhada", className: "text-[#8A8A8A]" },
@@ -200,13 +213,15 @@ export default function HeroSection() {
             <div className="relative h-[220px] bg-[#EDE9E1]">
               {isWorker ? (
                 destinationPosition ? (
-                  <LiveTrackingMap
-                    className="grayscale-[.15] contrast-[1.02]"
-                    workerPosition={workerPosition}
-                    destinationPosition={destinationPosition}
-                    workerLabel="Você"
-                    destinationLabel={`Endereço de ${counterpartName ?? "cliente"}`}
-                  />
+                  <Suspense fallback={<MapFallback />}>
+                    <LiveTrackingMap
+                      className="grayscale-[.15] contrast-[1.02]"
+                      workerPosition={workerPosition}
+                      destinationPosition={destinationPosition}
+                      workerLabel="Você"
+                      destinationLabel={`Endereço de ${counterpartName ?? "cliente"}`}
+                    />
+                  </Suspense>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-center px-6">
                     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -218,13 +233,15 @@ export default function HeroSection() {
                   </div>
                 )
               ) : workerPosition ? (
-                <LiveTrackingMap
-                  className="grayscale-[.15] contrast-[1.02]"
-                  workerPosition={workerPosition}
-                  destinationPosition={destinationPosition}
-                  workerLabel={counterpartName ?? "Profissional"}
-                  destinationLabel="Seu endereço"
-                />
+                <Suspense fallback={<MapFallback />}>
+                  <LiveTrackingMap
+                    className="grayscale-[.15] contrast-[1.02]"
+                    workerPosition={workerPosition}
+                    destinationPosition={destinationPosition}
+                    workerLabel={counterpartName ?? "Profissional"}
+                    destinationLabel="Seu endereço"
+                  />
+                </Suspense>
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 text-center px-6">
                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A8A8A" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
