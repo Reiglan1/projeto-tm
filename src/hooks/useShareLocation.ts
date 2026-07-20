@@ -24,10 +24,16 @@ function describeGeoError(code: number): ShareLocationStatus {
 }
 
 /**
- * Enquanto `active` for true, pede consentimento de localização ao
- * profissional, observa a posição do navegador e envia atualizações pro
- * back-end (limitadas a 1 a cada MIN_SEND_INTERVAL_MS pra não spammar).
- * Ao desativar (ou desmontar), revoga o consentimento e para de observar.
+ * Enquanto `active` for true, observa a posição do navegador e envia
+ * atualizações pro back-end (limitadas a 1 a cada MIN_SEND_INTERVAL_MS pra
+ * não spammar). Ao desativar (ou desmontar), revoga o consentimento e para
+ * de observar.
+ *
+ * IMPORTANTE: o pedido de permissão de localização ao navegador é disparado
+ * imediatamente, sem esperar nenhuma chamada de API nossa terminar primeiro.
+ * O registro de consentimento no back-end roda em paralelo, best-effort — se
+ * ele falhar (endpoint fora do ar, CORS, etc.) isso não deve impedir o
+ * navegador de perguntar a permissão nem de compartilhar a localização.
  *
  * Em desktops/VMs sem GPS, a primeira tentativa (alta precisão) pode falhar
  * com POSITION_UNAVAILABLE — nesse caso tentamos de novo com baixa precisão
@@ -53,6 +59,12 @@ export function useShareLocation(active: boolean) {
     let cancelled = false;
     fellBackRef.current = false;
     setStatus("requesting");
+
+    // Best-effort: registra o consentimento no back-end, mas não bloqueia
+    // (nem é bloqueado por) o pedido de localização ao navegador.
+    setWorkerLocationConsent({ scope: "service_order" }).catch((err) => {
+      console.warn("[useShareLocation] falha ao registrar consentimento:", err);
+    });
 
     function startWatch(highAccuracy: boolean) {
       if (watchIdRef.current !== null) {
@@ -101,14 +113,7 @@ export function useShareLocation(active: boolean) {
       );
     }
 
-    setWorkerLocationConsent({ scope: "service_order" })
-      .then(() => {
-        if (cancelled) return;
-        startWatch(true);
-      })
-      .catch(() => {
-        if (!cancelled) setStatus("error");
-      });
+    startWatch(true);
 
     return () => {
       cancelled = true;
