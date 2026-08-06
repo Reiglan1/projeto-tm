@@ -1,61 +1,12 @@
 // Constantes de rotas e nomes de páginas
 export const ROUTES = {
     // Páginas logadas
-    HOME: "/",
-
-    PROFILE: "/perfil",
-
-    VERIFICATION: "/verificacao",
-
-    OPEN_SERVICE_ORDER: "/abrir-chamado/:workerId",
-
-    WORKER_PROFILE: "/profissionais/:workerId",
-
-    CLIENT_PROFILE: "/clientes/:clientId",
-
-    MY_SERVICE_ORDERS: "/meus-chamados",
-
-    PROFESSIONAL_WALLET: "/carteira-profissional",
-
-    CLIENT_WALLET: "/carteira-cliente",
-
-    CATEGORIES: "/servicos",
-
-    PAYMENT: "/pagamento/:serviceOrderId",
-
-    CHAT: "/chamados/:serviceOrderId/chat",
-
-    MESSAGES: "/mensagens",
+    HOME: "/home",
 
     // Páginas que não estão logadas
-    LOGIN: "/login",
-
-    RESET_PASSWORD: "/redefinir-senha",
-
-
+    HOME_AUTH: "/",
 
 } as const;
-
-// Monta o caminho de "abrir chamado" já com o id do profissional escolhido
-export function buildOpenServiceOrderPath(workerId: string): string {
-    return `/abrir-chamado/${workerId}`;
-}
-
-export function buildWorkerProfilePath(workerId: string): string {
-    return `/profissionais/${workerId}`;
-}
-
-export function buildClientProfilePath(clientId: string): string {
-    return `/clientes/${clientId}`;
-}
-
-export function buildPaymentPath(serviceOrderId: string): string {
-    return `/pagamento/${serviceOrderId}`;
-}
-
-export function buildChatPath(serviceOrderId: string): string {
-    return `/chamados/${serviceOrderId}/chat`;
-}
 
 // // Mapeamento de rotas para nomes de páginas (para breadcrumbs)
 // export const PAGE_NAMES: { [key: string]: string } = {
