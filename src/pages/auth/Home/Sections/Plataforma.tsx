@@ -63,25 +63,27 @@ export default function Plataforma() {
     return (
 
         <>
-            <div className="bg-preto-2 pb-20">
-                <div className="text-amarelo-2 uppercase font-bold text-center pt-20">
-                    Tudo em um lugar
-                </div>
-                <div className="text-white text-center text-2xl sm:text-3xl md:text-4xl font-bold pt-2">
-                    Pare de perder horas procurando
-                </div>
-                <div className="text-white/40 text-center">
-                    A Three Minds centraliza busca, negociação e pagamento numa plataforma só.
+            <div className="bg-preto-2 pb-10 sm:pb-20">
+                <div className="container">
+                    <div className="text-amarelo-2 uppercase font-bold text-center pt-10 text-sm sm:pt-20 sm:text-base">
+                        Tudo em um lugar
+                    </div>
+                    <div className="text-white text-center text-2xl sm:text-3xl md:text-4xl font-bold pt-2">
+                        Pare de perder horas procurando
+                    </div>
+                    <div className="text-white/40 text-center text-sm sm:text-base">
+                        A Three Minds centraliza busca, negociação e pagamento numa plataforma só.
+                    </div>
                 </div>
 
-                <div className="container pt-10">
-                    <div className="flex justify-center gap-2">
+                <div className="container pt-6 sm:pt-10">
+                    <div className="flex justify-center gap-1.5 sm:gap-2">
                         {TABS.map((t) => (
                             <button
                                 key={t.key}
                                 type="button"
                                 onClick={() => setActiveTab(t.key)}
-                                className={`cursor-pointer rounded-full px-5 py-2 text-sm font-bold transition ${t.key === activeTab
+                                className={`cursor-pointer rounded-full px-3 py-1.5 text-xs font-bold transition sm:px-5 sm:py-2 sm:text-sm ${t.key === activeTab
                                     ? "bg-amarelo-2 text-preto-2"
                                     : "bg-white/10 text-white hover:bg-white/15"
                                     }`}
@@ -91,10 +93,10 @@ export default function Plataforma() {
                         ))}
                     </div>
 
-                    <div className="mt-8 rounded-3xl bg-white/5 border border-white/10 p-6 sm:p-10">
-                        <div className="grid gap-10 sm:grid-cols-2 sm:items-center">
-                            <div className="flex flex-col gap-5">
-                                <h3 className="text-xl sm:text-2xl font-bold text-white">
+                    <div className="mt-6 rounded-2xl bg-white/5 border border-white/10 p-5 sm:mt-8 sm:rounded-3xl sm:p-10">
+                        <div className="grid gap-6 sm:grid-cols-2 sm:items-center sm:gap-10">
+                            <div className="flex flex-col gap-4 sm:gap-5">
+                                <h3 className="text-lg sm:text-2xl font-bold text-white">
                                     {tab.heading}
                                 </h3>
                                 <ul className="space-y-3">
@@ -115,10 +117,10 @@ export default function Plataforma() {
 
                             <div className="overflow-hidden rounded-xl border border-white/10 bg-black/40">
                                 <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-                                    <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-                                    <span className="h-2.5 w-2.5 rounded-full bg-amarelo-2" />
-                                    <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
-                                    <span className="ml-2 text-xs text-white/40">{tab.url}</span>
+                                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-red-500" />
+                                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-amarelo-2" />
+                                    <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-green-500" />
+                                    <span className="ml-2 min-w-0 truncate text-xs text-white/40">{tab.url}</span>
                                 </div>
                                 <div className="space-y-3 p-4">
                                     {tab.rows.map((row, i) => (

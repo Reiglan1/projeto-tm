@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import Marquee from "react-fast-marquee";
 
@@ -40,31 +41,40 @@ const DEPOIMENTOS = [
 ];
 
 export default function Depoimentos() {
+    const [gradientWidth, setGradientWidth] = useState(32);
+
+    useEffect(() => {
+        const mq = window.matchMedia("(min-width: 768px)");
+        const update = () => setGradientWidth(mq.matches ? 80 : 32);
+        update();
+        mq.addEventListener("change", update);
+        return () => mq.removeEventListener("change", update);
+    }, []);
 
     return (
 
         <>
-            <div className="container pt-20">
-                <div className="text-amarelo-2 uppercase font-bold text-center">
+            <div className="container pt-10 sm:pt-20">
+                <div className="text-amarelo-2 uppercase font-bold text-center text-sm sm:text-base">
                     Depoimentos
                 </div>
                 <div className="text-preto-2 text-center text-2xl sm:text-3xl md:text-4xl font-bold pt-2">
                     Quem usou, aprovou.
                 </div>
             </div>
-            <div className="mt-8 pb-20">
+            <div className="mt-6 pb-10 sm:mt-8 sm:pb-20">
                 <Marquee
                     speed={40}
                     pauseOnHover
                     autoFill
                     gradient
                     gradientColor="#ffffff"
-                    gradientWidth={80}
+                    gradientWidth={gradientWidth}
                 >
                     {DEPOIMENTOS.map((depoimento) => (
                         <div
                             key={depoimento.handle}
-                            className="mx-2 w-72 shrink-0 rounded-2xl border border-gray-200 bg-white p-5 sm:mx-3 sm:w-80"
+                            className="mx-1.5 w-64 shrink-0 rounded-2xl border border-gray-200 bg-white p-4 sm:mx-3 sm:w-80 sm:p-5"
                         >
                             <div className="flex gap-0.5 text-amarelo-2">
                                 {Array.from({ length: 5 }).map((_, i) => (

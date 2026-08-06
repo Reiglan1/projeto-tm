@@ -35,15 +35,15 @@ export default function Faq() {
     return (
 
         <>
-            <div className="container pt-20 pb-20">
-                <div className="text-amarelo-2 uppercase font-bold text-center">
+            <div className="container pt-10 pb-10 sm:pt-20 sm:pb-20">
+                <div className="text-amarelo-2 uppercase font-bold text-center text-sm sm:text-base">
                     Dúvidas frequentes
                 </div>
                 <div className="text-preto-2 text-center text-2xl sm:text-3xl md:text-4xl font-bold pt-2">
                     Perguntas frequentes
                 </div>
 
-                <div className="mx-auto mt-10 max-w-2xl">
+                <div className="mx-auto mt-6 max-w-2xl sm:mt-10">
                     {FAQS.map((faq, i) => {
                         const isOpen = open === i;
                         return (
@@ -51,9 +51,9 @@ export default function Faq() {
                                 <button
                                     type="button"
                                     onClick={() => setOpen(isOpen ? null : i)}
-                                    className="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left"
+                                    className="flex w-full cursor-pointer items-center justify-between gap-3 py-4 text-left sm:gap-4 sm:py-5"
                                 >
-                                    <span className="font-semibold text-preto-2">
+                                    <span className="text-sm font-semibold text-preto-2 sm:text-base">
                                         {faq.pergunta}
                                     </span>
                                     <Plus
@@ -62,14 +62,14 @@ export default function Faq() {
                                     />
                                 </button>
                                 {isOpen && (
-                                    <p className="pb-5 text-sm text-cinza-1">{faq.resposta}</p>
+                                    <p className="pb-4 text-sm text-cinza-1 sm:pb-5">{faq.resposta}</p>
                                 )}
                             </div>
                         );
                     })}
                 </div>
 
-                <div className="mt-8 text-center text-sm text-cinza-1">
+                <div className="mt-6 text-center text-sm text-cinza-1 sm:mt-8">
                     Ainda tem dúvidas?{" "}
                     <a href="#" className="font-bold text-amarelo-2 hover:opacity-80">
                         Fale no WhatsApp

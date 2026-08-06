@@ -45,68 +45,68 @@ export default function Profissionais() {
 
         <>
             <div className="bg-[#FAFAF8] border-b border-preto-2/20">
-                <div className="container pt-20 pb-20">
+                <div className="container pt-10 pb-10 sm:pt-20 sm:pb-20">
                     <div>
-                        <div className="text-sm font-bold uppercase text-cinza-1">
+                        <div className="text-xs font-bold uppercase text-cinza-1 sm:text-sm">
                             Destaque
                         </div>
-                        <div className="text-3xl font-bold text-preto-2">
+                        <div className="text-2xl font-bold text-preto-2 sm:text-3xl">
                             Profissionais mais bem avaliados
                         </div>
                     </div>
 
-                    <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
+                    <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:grid-cols-4 sm:gap-6">
                         {PROFISSIONAIS.map((pro) => (
                             <div
                                 key={pro.nome}
-                                className="overflow-hidden rounded-2xl border border-gray-200 bg-white"
+                                className="overflow-hidden rounded-xl border border-gray-200 bg-white sm:rounded-2xl"
                             >
                                 <div className="relative">
                                     <img
                                         src={pro.foto}
                                         alt={pro.nome}
-                                        className="h-48 w-full object-cover"
+                                        className="h-32 w-full object-cover sm:h-48"
                                     />
                                     <button
                                         type="button"
                                         aria-label="Favoritar"
-                                        className="absolute top-3 right-3 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow hover:bg-white"
+                                        className="absolute top-2 right-2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-white/90 shadow hover:bg-white sm:top-3 sm:right-3 sm:h-8 sm:w-8"
                                     >
-                                        <Heart className="h-4 w-4 text-preto-2" />
+                                        <Heart className="h-3.5 w-3.5 text-preto-2 sm:h-4 sm:w-4" />
                                     </button>
                                 </div>
 
-                                <div className="p-4">
-                                    <div className="flex items-center justify-between gap-2">
-                                        <span className="flex items-center gap-1 font-bold text-preto-2">
-                                            {pro.nome}
-                                            <BadgeCheck className="h-4 w-4 text-amarelo-2" />
+                                <div className="p-2.5 sm:p-4">
+                                    <div className="flex items-center justify-between gap-1">
+                                        <span className="flex min-w-0 items-center gap-1 truncate text-sm font-bold text-preto-2 sm:text-base">
+                                            <span className="truncate">{pro.nome}</span>
+                                            <BadgeCheck className="h-3.5 w-3.5 shrink-0 text-amarelo-2 sm:h-4 sm:w-4" />
                                         </span>
-                                        <span className="shrink-0 font-bold text-amarelo-2">
+                                        <span className="shrink-0 text-sm font-bold text-amarelo-2 sm:text-base">
                                             {pro.preco}
                                         </span>
                                     </div>
 
-                                    <p className="text-sm text-cinza-1">{pro.profissao}</p>
+                                    <p className="truncate text-xs text-cinza-1 sm:text-sm">{pro.profissao}</p>
 
-                                    <div className="mt-2 flex items-center justify-between text-sm text-cinza-1">
+                                    <div className="mt-2 flex flex-col gap-1 text-xs text-cinza-1 sm:flex-row sm:items-center sm:justify-between sm:text-sm">
                                         <span className="flex items-center gap-1">
                                             <Star
-                                                className="h-3.5 w-3.5 text-amarelo-2"
+                                                className="h-3.5 w-3.5 shrink-0 text-amarelo-2"
                                                 fill="currentColor"
                                             />
                                             <span className="font-bold text-preto-2">{pro.nota}</span>
                                             <span>({pro.avaliacoes})</span>
                                         </span>
-                                        <span className="flex items-center gap-1">
-                                            <MapPin className="h-3.5 w-3.5" />
-                                            {pro.local}
+                                        <span className="flex min-w-0 items-center gap-1">
+                                            <MapPin className="h-3.5 w-3.5 shrink-0" />
+                                            <span className="truncate">{pro.local}</span>
                                         </span>
                                     </div>
 
                                     <button
                                         type="button"
-                                        className="mt-4 w-full cursor-pointer rounded-xl bg-amarelo-2/15 py-2 text-sm font-bold text-amarelo-2 transition hover:bg-amarelo-2/25"
+                                        className="mt-3 w-full cursor-pointer rounded-xl bg-amarelo-2/15 py-1.5 text-xs font-bold text-amarelo-2 transition hover:bg-amarelo-2/25 sm:mt-4 sm:py-2 sm:text-sm"
                                     >
                                         Ver perfil
                                     </button>
